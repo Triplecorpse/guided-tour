@@ -3,7 +3,7 @@ import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { PoiModule } from "./poi/poi.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { LocationModule } from './location/location.module';
+import { LocationModule } from "./location/location.module";
 
 @Module({
   imports: [

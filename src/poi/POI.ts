@@ -6,7 +6,6 @@ import {
   IsNumber,
   IsObject,
   IsString,
-  Length,
   ValidateNested,
 } from "class-validator";
 import { PartialType } from "@nestjs/mapped-types";
@@ -18,7 +17,12 @@ import {
   Point,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Location } from "../location/location";
+import {
+  CreateLocationDTO,
+  Location,
+  LocationDTO,
+  UpdateLocationDTO,
+} from "../location/location";
 import { Type } from "class-transformer";
 
 export class GeoPointDTO {
@@ -43,10 +47,15 @@ export class CreatePoiDTO {
   @ValidateNested()
   @Type(() => GeoPointDTO)
   point: GeoPointDTO;
+
+  @IsObject()
+  @ValidateNested()
+  @Type(() => LocationDTO)
+  location: CreateLocationDTO | UpdateLocationDTO;
 }
 
 export class UpdatePoiDTO extends PartialType(CreatePoiDTO) {
-  readonly id?: number;
+  readonly id: number;
   readonly name?: string;
   readonly type?: string;
   @IsObject()
@@ -69,6 +78,6 @@ export class POI {
   type: string;
 
   @JoinTable()
-  @ManyToOne((type) => Location, (location) => location.pois)
+  @ManyToOne((type) => Location, (location) => location.pois, { cascade: true })
   location: Location;
 }

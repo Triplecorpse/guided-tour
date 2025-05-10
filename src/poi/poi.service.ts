@@ -2,6 +2,11 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreatePoiDTO, POI, UpdatePoiDTO } from "./POI";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, Position } from "typeorm";
+import {
+  CreateLocationDTO,
+  Location,
+  UpdateLocationDTO,
+} from "../location/location";
 
 class GeoPoint {
   type = "Point" as const;
@@ -15,15 +20,23 @@ class GeoPoint {
 @Injectable()
 export class PoiService {
   constructor(
-    @InjectRepository(POI) private readonly poiRepository: Repository<POI>,
+    @InjectRepository(POI)
+    private readonly poiRepository: Repository<POI>,
+    @InjectRepository(Location)
+    private readonly locationRepository: Repository<Location>,
   ) {}
 
   findAll(): Promise<POI[]> {
-    return this.poiRepository.find();
+    return this.poiRepository.find({
+      relations: ["location"],
+    });
   }
 
   async find(args: Partial<POI>): Promise<POI[]> {
-    const poi = await this.poiRepository.findOne({ where: { id: args.id } });
+    const poi = await this.poiRepository.findOne({
+      where: { id: args.id },
+      relations: ["location"],
+    });
     if (!poi) {
       throw new NotFoundException("Poi not found");
     }
@@ -31,13 +44,13 @@ export class PoiService {
   }
 
   create(poi: CreatePoiDTO): Promise<POI> {
-    console.log(poi);
     const newPoi = this.poiRepository.create({
       ...poi,
       point: {
         type: "Point",
         coordinates: poi.point.coordinates, // [lng, lat]
       },
+      location: poi.location,
     });
     return this.poiRepository.save(newPoi);
   }
@@ -61,5 +74,22 @@ export class PoiService {
     }
 
     return ids;
+  }
+
+  private async preloadLocation(
+    location: Partial<CreateLocationDTO | UpdateLocationDTO>,
+  ): Promise<Location> {
+    if ("id" in location && location.id) {
+      const foundLocation = await this.locationRepository.findOne({
+        where: { id: location.id },
+      });
+
+      if (!foundLocation) {
+        throw new NotFoundException("Location not found");
+      }
+
+      return foundLocation;
+    }
+    return this.locationRepository.create(location);
   }
 }
