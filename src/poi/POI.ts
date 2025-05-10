@@ -80,4 +80,7 @@ export class POI {
   @JoinTable()
   @ManyToOne((type) => Location, (location) => location.pois, { cascade: true })
   location: Location;
+
+  @Column({ default: 0 })
+  recommendations: number;
 }

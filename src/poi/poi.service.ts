@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { CreatePoiDTO, POI, UpdatePoiDTO } from "./POI";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Position } from "typeorm";
+import { Repository, Position, DataSource } from "typeorm";
 import {
   CreateLocationDTO,
   Location,
   UpdateLocationDTO,
 } from "../location/location";
+import { PaginationQueryDto } from "../common/pagination-query.dto/pagination-query.dto";
+import { EventEntity } from "../events/entities/event.entity/event.entity";
 
 class GeoPoint {
   type = "Point" as const;
@@ -24,11 +26,15 @@ export class PoiService {
     private readonly poiRepository: Repository<POI>,
     @InjectRepository(Location)
     private readonly locationRepository: Repository<Location>,
+    private readonly connection: DataSource,
   ) {}
 
-  findAll(): Promise<POI[]> {
+  findAll(paginationQuery: PaginationQueryDto): Promise<POI[]> {
+    const { limit, offset } = paginationQuery;
     return this.poiRepository.find({
       relations: ["location"],
+      skip: offset,
+      take: limit,
     });
   }
 
@@ -91,5 +97,25 @@ export class PoiService {
       return foundLocation;
     }
     return this.locationRepository.create(location);
+  }
+
+  private async recommendPOI(poi: POI) {
+    const queryRunner = this.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      poi.recommendations++;
+      const recommendEvent = new EventEntity();
+      recommendEvent.name = "recommend_poi";
+      recommendEvent.type = "poi";
+      recommendEvent.payload = { poiId: poi.id };
+      await queryRunner.commitTransaction();
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
   }
 }
