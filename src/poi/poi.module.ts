@@ -5,10 +5,15 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { POI } from "./POI";
 import { Location } from "../location/location";
 import { EventEntity } from "src/events/entities/event.entity/event.entity";
+import { ConfigModule } from "@nestjs/config";
+import poisConfig from "./config/pois.config";
 
 @Module({
   providers: [PoiService],
   controllers: [PoiController],
-  imports: [TypeOrmModule.forFeature([POI, Location, EventEntity])],
+  imports: [
+    TypeOrmModule.forFeature([POI, Location, EventEntity]),
+    ConfigModule.forFeature(poisConfig),
+  ],
 })
 export class PoiModule {}

@@ -28,7 +28,6 @@ export class PoiController {
 
   @Post()
   create(@Body() buddy: CreatePoiDTO) {
-    console.log(buddy);
     return this.poiService.create(buddy);
   }
 

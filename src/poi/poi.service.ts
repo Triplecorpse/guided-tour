@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { CreatePoiDTO, POI, UpdatePoiDTO } from "./POI";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, Position, DataSource } from "typeorm";
@@ -9,6 +9,8 @@ import {
 } from "../location/location";
 import { PaginationQueryDto } from "../common/pagination-query.dto/pagination-query.dto";
 import { EventEntity } from "../events/entities/event.entity/event.entity";
+import { ConfigService, ConfigType } from "@nestjs/config";
+import poisConfig from "./config/pois.config";
 
 class GeoPoint {
   type = "Point" as const;
@@ -27,7 +29,11 @@ export class PoiService {
     @InjectRepository(Location)
     private readonly locationRepository: Repository<Location>,
     private readonly connection: DataSource,
-  ) {}
+    @Inject(poisConfig.KEY)
+    private readonly configService: ConfigType<typeof poisConfig>,
+  ) {
+    console.log(configService.name);
+  }
 
   findAll(paginationQuery: PaginationQueryDto): Promise<POI[]> {
     const { limit, offset } = paginationQuery;
