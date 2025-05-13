@@ -5,6 +5,7 @@ import { AppService } from "./app.service";
 import { PoiModule } from "./poi/poi.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { LocationModule } from "./location/location.module";
+import { CommonModule } from "./common/common.module";
 import * as Joi from "joi";
 import * as process from "node:process";
 import appConfig from "./config/app.config";
@@ -32,6 +33,7 @@ import appConfig from "./config/app.config";
     }),
     PoiModule,
     LocationModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],

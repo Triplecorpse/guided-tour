@@ -9,7 +9,7 @@ import {
 } from "../location/location";
 import { PaginationQueryDto } from "../common/pagination-query.dto/pagination-query.dto";
 import { EventEntity } from "../events/entities/event.entity/event.entity";
-import { ConfigService, ConfigType } from "@nestjs/config";
+import { ConfigType } from "@nestjs/config";
 import poisConfig from "./config/pois.config";
 
 class GeoPoint {
@@ -31,9 +31,7 @@ export class PoiService {
     private readonly connection: DataSource,
     @Inject(poisConfig.KEY)
     private readonly configService: ConfigType<typeof poisConfig>,
-  ) {
-    console.log(configService.name);
-  }
+  ) {}
 
   findAll(paginationQuery: PaginationQueryDto): Promise<POI[]> {
     const { limit, offset } = paginationQuery;
