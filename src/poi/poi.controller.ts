@@ -9,16 +9,22 @@ import {
   Query,
 } from "@nestjs/common";
 import { PoiService } from "./poi.service";
-import { CreatePoiDTO, POI, UpdatePoiDTO } from "./POI";
+import { POI } from "./interface/POI";
 import { PaginationQueryDto } from "../common/pagination-query.dto/pagination-query.dto";
 import { Public } from "../common/decorators/public.decorator";
 import { ParseIntPipe } from "../common/pipes/parse-int/parse-int/.pipe";
 import { Protocol } from "../common/decorators/protocol.decorator";
+import { CreatePoiDTO } from "./interface/CreatePoiDTO";
+import { UpdatePoiDTO } from "./interface/UpdatePoiDTO";
+import { ApiForbiddenResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 
+@ApiTags("pois")
 @Controller("poi")
 export class PoiController {
   constructor(private readonly poiService: PoiService) {}
 
+  @ApiOkResponse({ type: CreatePoiDTO })
+  @ApiForbiddenResponse({ description: "Forbidden" })
   @Public()
   @Get("all")
   findAll(
@@ -40,8 +46,8 @@ export class PoiController {
   }
 
   @Patch(":id")
-  update(@Param("id") id: string, @Body() buddy: UpdatePoiDTO) {
-    return this.poiService.update(buddy);
+  update(@Param("id") id: number, @Body() buddy: UpdatePoiDTO) {
+    return this.poiService.update({ ...buddy, id });
   }
 
   @Delete(":id")

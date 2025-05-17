@@ -10,6 +10,15 @@ services:
       POSTGRES_PASSWORD: pass123
     volumes:
       - postgres_data:/var/lib/postgresql/data  # Named volume for PostgreSQL data
+  test-db:
+    image: postgis/postgis:latest
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: pass123
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
