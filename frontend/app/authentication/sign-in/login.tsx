@@ -1,28 +1,11 @@
-import { FormLabel, Input, TextField } from "@mui/material";
+import { AuthenticationForm } from "@/app/authentication/components/form";
 
 export default function Login() {
   return (
-    <div>
-      <form>
-        <div>
-          <TextField
-            id="email"
-            name="email"
-            label="Email"
-            variant="standard"
-            required={true}
-          />
-        </div>
-        <div>
-          <TextField
-            id="password"
-            name="password"
-            label="Password"
-            variant="standard"
-            required={true}
-          />
-        </div>
-      </form>
-    </div>
+    <AuthenticationForm
+      password={true}
+      email={true}
+      name={false}
+    ></AuthenticationForm>
   );
 }

@@ -1,3 +1,11 @@
+import { AuthenticationForm } from "@/app/authentication/components/form";
+
 export function ForgotPassword() {
-  return <div>ForgotPassword</div>;
+  return (
+    <AuthenticationForm
+      password={false}
+      email={true}
+      name={false}
+    ></AuthenticationForm>
+  );
 }
