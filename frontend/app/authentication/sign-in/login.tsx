@@ -1,4 +1,4 @@
-import { AuthenticationForm } from "@/app/authentication/components/form";
+import { AuthenticationForm } from "@/authentication/components/form";
 
 export default function Login() {
   return (

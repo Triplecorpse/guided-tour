@@ -1,5 +1,4 @@
-import { TextField } from "@mui/material";
-import { AuthenticationForm } from "@/app/authentication/components/form";
+import { AuthenticationForm } from "@/authentication/components/form";
 
 export function Signup() {
   return (

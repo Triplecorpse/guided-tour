@@ -1,7 +1,6 @@
-import { Signup } from "@/app/authentication/sign-up/signup";
-import AbstractPage from "@/app/authentication/abstract-page";
-import { Button } from "@mui/material";
-import Links from "@/app/authentication/components/links";
+import { Signup } from "@/authentication/sign-up/signup";
+import AbstractPage from "@/authentication/abstract-page";
+import Links from "@/authentication/components/links";
 
 export default function Page() {
   return (

@@ -1,3 +1,6 @@
+"use client";
+
+import "@/i18n/i18n";
 import { TextField } from "@mui/material";
 
 interface AuthenticationFormProps {
@@ -6,7 +9,11 @@ interface AuthenticationFormProps {
   name: boolean;
 }
 
+import { useTranslation } from "react-i18next";
+
 export function AuthenticationForm(view: AuthenticationFormProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="mb-4">
       <div className="mb-4">
@@ -15,7 +22,7 @@ export function AuthenticationForm(view: AuthenticationFormProps) {
             className="w-full"
             id="email"
             name="email"
-            label="Email"
+            label={t("email")}
             variant="standard"
             required={true}
           />
@@ -27,7 +34,7 @@ export function AuthenticationForm(view: AuthenticationFormProps) {
             className="w-full"
             id="name"
             name="name"
-            label="Full Name"
+            label={t("name")}
             variant="standard"
             required={true}
           />
@@ -40,7 +47,7 @@ export function AuthenticationForm(view: AuthenticationFormProps) {
             id="password"
             name="password"
             type="password"
-            label="Password"
+            label={t("password")}
             variant="standard"
             required={true}
           />
