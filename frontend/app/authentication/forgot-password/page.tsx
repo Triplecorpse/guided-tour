@@ -4,7 +4,7 @@ import Links from "@/authentication/components/links";
 
 export default function Page() {
   return (
-    <AbstractPage>
+    <AbstractPage state="forgot">
       <ForgotPassword />
       <Links signin={true} signup={true} forgot={false}></Links>
     </AbstractPage>
