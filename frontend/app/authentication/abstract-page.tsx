@@ -1,17 +1,29 @@
-import { Button, Card } from "@mui/material";
+const [
+  { Button, Card, Alert },
+  { useForm, FormProvider },
+  { useState },
+  { router },
+  { FormUIContext },
+] = await Promise.all([
+  import("@mui/material"),
+  import("react-hook-form"),
+  import("react"),
+  import("next/client"),
+  import("./form-ui-context"),
+]);
 
 interface AbstractPageProps {
   children: React.ReactNode;
   state: "signin" | "signup" | "forgot";
 }
 
-export default function AbstractPage({
-  children,
-  state,
-}: Readonly<AbstractPageProps>) {
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+export function AbstractPage({ children, state }: Readonly<AbstractPageProps>) {
+  const methods = useForm();
+  const { handleSubmit } = methods;
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const onSubmit = handleSubmit(async (data) => {
     let endpoint = "";
 
     switch (state) {
@@ -28,30 +40,68 @@ export default function AbstractPage({
         throw new Error("Unknown state");
     }
 
-    await fetch(endpoint, {
-      method: "POST", // Use POST if you're sending data
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email: "test@email.com", password: "123456" }), // replace with actual form data
-    });
-  };
+    try {
+      setIsSubmitting(true);
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const json: Record<string, any> = await response.json();
+
+      if (!response.ok) {
+        setFormError((json.message as string) ?? "An unknown error occurred");
+        return;
+      }
+
+      console.log("Success:", response);
+
+      if (state === "signup") {
+        await router.push("/authentication/sign-in");
+      }
+    } catch (e: unknown) {
+      setFormError(
+        e instanceof Error ? e.message : "An unknown error occurred",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  });
 
   return (
     <div className="flex h-screen bg-amber-50">
-      <form className="m-auto" onSubmit={handleSubmit}>
-        <Card variant="outlined" className="p-4">
-          {children}
-          <div className="flex justify-between mt-4">
-            <Button variant="outlined" type="button">
-              Return
-            </Button>
-            <Button variant="contained" type="submit">
-              OK
-            </Button>
-          </div>
-        </Card>
-      </form>
+      <FormProvider {...methods}>
+        <FormUIContext.Provider value={{ disabled: isSubmitting }}>
+          <form className="m-auto" onSubmit={onSubmit}>
+            <Card variant="outlined" className="p-4">
+              {formError && (
+                <Alert severity="error" className="mb-4">
+                  {formError}
+                </Alert>
+              )}
+              {children}
+              <div className="flex justify-between mt-4">
+                <Button
+                  variant="outlined"
+                  type="button"
+                  disabled={isSubmitting}
+                >
+                  Return
+                </Button>
+                <Button
+                  variant="contained"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  OK
+                </Button>
+              </div>
+            </Card>
+          </form>
+        </FormUIContext.Provider>
+      </FormProvider>
     </div>
   );
 }

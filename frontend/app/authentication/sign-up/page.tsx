@@ -1,6 +1,10 @@
-import { Signup } from "@/authentication/sign-up/signup";
-import AbstractPage from "@/authentication/abstract-page";
-import Links from "@/authentication/components/links";
+"use client";
+
+const [{ Signup }, { AbstractPage }, { Links }] = await Promise.all([
+  import("@/authentication/sign-up/signup"),
+  import("@/authentication/abstract-page"),
+  import("@/authentication/components/links"),
+]);
 
 export default function Page() {
   return (

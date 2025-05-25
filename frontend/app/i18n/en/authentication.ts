@@ -6,3 +6,9 @@ export const authentication = {
   signup: "Sign Up",
   recover: "Recover Password",
 };
+
+export const authentication_errors = {
+  emailRequired: "Email is required",
+  passwordRequired: "Password is required",
+  nameRequired: "Name is required",
+};

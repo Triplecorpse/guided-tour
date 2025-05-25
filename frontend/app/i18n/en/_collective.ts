@@ -1,5 +1,9 @@
-import { authentication } from "@/i18n/en/authentication";
+import {
+  authentication,
+  authentication_errors,
+} from "@/i18n/en/authentication";
 
 export const en = {
-  ...authentication,
+  authentication,
+  authentication_errors,
 };

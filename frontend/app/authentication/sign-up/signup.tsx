@@ -1,4 +1,6 @@
-import { AuthenticationForm } from "@/authentication/components/form";
+const [{ AuthenticationForm }] = await Promise.all([
+  import("@/authentication/components/form"),
+]);
 
 export function Signup() {
   return (

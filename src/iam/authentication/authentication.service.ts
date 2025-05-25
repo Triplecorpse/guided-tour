@@ -21,15 +21,15 @@ export class AuthenticationService {
     try {
       const user = new User();
       user.email = dto.email;
+      user.full_name = dto.full_name;
       user.password = await this.hashingService.hash(dto.password);
 
       await this.userRepository.save(user);
       return true;
     } catch (e) {
       const pgUniqueViolationErrorCode = "23505";
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (e.code === pgUniqueViolationErrorCode) {
-        throw new ConflictException();
+        throw new ConflictException(e.detail);
       }
       throw e;
     }
