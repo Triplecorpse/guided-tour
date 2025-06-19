@@ -1,7 +1,8 @@
 // You can also split GET/POST separately if needed
 import { NextRequest, NextResponse } from "next/server";
+import { API_URL } from "@/config";
 
-const BACKEND_URL = "http://localhost:3000/auth";
+const BACKEND_URL = API_URL + "/authentication/sign-in";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();

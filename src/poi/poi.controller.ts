@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
 } from "@nestjs/common";
 import { PoiService } from "./poi.service";
 import { POI } from "./interface/POI";
@@ -17,21 +18,21 @@ import { Protocol } from "../common/decorators/protocol.decorator";
 import { CreatePoiDTO } from "./interface/CreatePoiDTO";
 import { UpdatePoiDTO } from "./interface/UpdatePoiDTO";
 import { ApiForbiddenResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { Request } from "express";
+import { ActiveUser } from "../iam/decorators/active-user.decorator";
+import { UserPayload } from "../iam/types/UserPayload";
 
 @ApiTags("pois")
 @Controller("poi")
 export class PoiController {
   constructor(private readonly poiService: PoiService) {}
 
-  @ApiOkResponse({ type: CreatePoiDTO })
-  @ApiForbiddenResponse({ description: "Forbidden" })
-  @Public()
   @Get("all")
   findAll(
-    @Protocol("https") protocol: string,
     @Query() paginationQuery: PaginationQueryDto,
+    @Req() request: Request,
+    @ActiveUser() user: UserPayload | string | number,
   ): Promise<POI[]> {
-    console.log(protocol);
     return this.poiService.findAll(paginationQuery);
   }
 

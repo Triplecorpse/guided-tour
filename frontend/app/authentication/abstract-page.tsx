@@ -2,14 +2,14 @@ const [
   { Button, Card, Alert },
   { useForm, FormProvider },
   { useState },
-  { router },
   { FormUIContext },
+  { useRouter },
 ] = await Promise.all([
   import("@mui/material"),
   import("react-hook-form"),
   import("react"),
-  import("next/client"),
   import("./form-ui-context"),
+  import("next/navigation"),
 ]);
 
 interface AbstractPageProps {
@@ -19,6 +19,7 @@ interface AbstractPageProps {
 
 export function AbstractPage({ children, state }: Readonly<AbstractPageProps>) {
   const methods = useForm();
+  const router = useRouter();
   const { handleSubmit } = methods;
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +60,11 @@ export function AbstractPage({ children, state }: Readonly<AbstractPageProps>) {
       console.log("Success:", response);
 
       if (state === "signup") {
-        await router.push("/authentication/sign-in");
+        router.push("/authentication/sign-in");
+      } else if (state === "signin") {
+        console.log(json);
+        localStorage.setItem("Auth", json.token);
+        router.push("/personal");
       }
     } catch (e: unknown) {
       setFormError(

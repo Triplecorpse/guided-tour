@@ -4,15 +4,30 @@ import { BcryptService } from "./bcrypt.service";
 import { AuthenticationController } from "./authentication/authentication.controller";
 import { AuthenticationService } from "./authentication/authentication.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { User } from "../user/User";
+import { User } from "./User";
+import { JwtModule } from "@nestjs/jwt";
+import jwtConfig from "./config/jwt.config";
+import { APP_GUARD } from "@nestjs/core";
+import { ConfigModule } from "@nestjs/config";
+import { AuthenticationGuard } from "./authentication/guards/authentication/authentication.guard";
+import { AccessTokenGuard } from "./authentication/guards/access-token/access-token.guard";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [
+    TypeOrmModule.forFeature([User]),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
+    ConfigModule.forFeature(jwtConfig),
+  ],
   providers: [
     {
       provide: HashingService,
       useClass: BcryptService,
     },
+    {
+      provide: APP_GUARD,
+      useClass: AuthenticationGuard,
+    },
+    AccessTokenGuard,
     AuthenticationService,
   ],
   controllers: [AuthenticationController],

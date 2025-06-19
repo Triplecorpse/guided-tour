@@ -1,6 +1,10 @@
-import AbstractPage from "@/authentication/abstract-page";
-import { ForgotPassword } from "@/authentication/forgot-password/forgot-password";
-import Links from "@/authentication/components/links";
+"use client";
+
+const [{ AbstractPage }, { ForgotPassword }, { Links }] = await Promise.all([
+  import("@/authentication/abstract-page"),
+  import("@/authentication/forgot-password/forgot-password"),
+  import("@/authentication/components/links"),
+]);
 
 export default function Page() {
   return (

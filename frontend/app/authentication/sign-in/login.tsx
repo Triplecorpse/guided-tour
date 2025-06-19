@@ -1,6 +1,6 @@
 import { AuthenticationForm } from "@/authentication/components/form";
 
-export default function Login() {
+export function Login() {
   return (
     <AuthenticationForm
       password={true}
