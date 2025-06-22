@@ -1,18 +1,68 @@
 // slices/authSlice.ts
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type AuthState = {
+  user: User | null;
+  status: "idle" | "loading" | "authenticated" | "unauthenticated" | "error";
+};
+
+const initialState: AuthState = {
+  user: null,
+  status: "idle",
+};
+
+// ✅ Async thunk to check auth
+export const checkAuth = createAsyncThunk(
+  "auth/checkAuth",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch("/api/auth/me", {
+        credentials: "include", // send cookies if needed
+      });
+
+      if (!res.ok) {
+        return rejectWithValue("Not authenticated");
+      }
+
+      const data = await res.json();
+      return data as User;
+    } catch (err) {
+      return rejectWithValue("Request failed");
+    }
+  },
+);
 
 const authSlice = createSlice({
   name: "auth",
-  initialState: { user: null },
+  initialState,
   reducers: {
-    login(state, action) {
-      state.user = action.payload;
-    },
     logout(state) {
       state.user = null;
+      state.status = "unauthenticated";
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(checkAuth.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(checkAuth.fulfilled, (state, action: PayloadAction<User>) => {
+        state.user = action.payload;
+        state.status = "authenticated";
+      })
+      .addCase(checkAuth.rejected, (state) => {
+        state.user = null;
+        state.status = "unauthenticated";
+      });
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
