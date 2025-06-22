@@ -2,7 +2,8 @@ import { languages } from "@/i18n/settings";
 import { getT } from "@/i18n";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.scss";
-import { EmotionProvider } from "@/providets";
+import { EmotionProvider } from "@/providers";
+import StoreProvider from "@/StoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,9 @@ export default async function Layout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <EmotionProvider>{children}</EmotionProvider>
+        <EmotionProvider>
+          <StoreProvider>{children}</StoreProvider>
+        </EmotionProvider>
       </body>
     </html>
   );

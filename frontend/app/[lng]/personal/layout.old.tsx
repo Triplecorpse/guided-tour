@@ -1,6 +1,6 @@
 "use client";
 
-import { EmotionProvider } from "@/providets";
+import { EmotionProvider } from "@/providers";
 
 export default function PersonalLayout({
   children,
