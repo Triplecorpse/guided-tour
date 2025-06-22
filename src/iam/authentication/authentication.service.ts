@@ -69,4 +69,11 @@ export class AuthenticationService {
     );
     return { accessToken };
   }
+
+  async check(): Promise<{
+    isAuthenticated: boolean;
+    user?: { name: string };
+  }> {
+    return { isAuthenticated: true, user: { name: "Joe" } };
+  }
 }

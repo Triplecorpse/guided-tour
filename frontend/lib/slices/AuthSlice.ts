@@ -23,16 +23,21 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch("/api/auth/me", {
+      const res = await fetch("/api/authentication/check", {
         credentials: "include", // send cookies if needed
       });
 
       if (!res.ok) {
-        return rejectWithValue("Not authenticated");
+        return rejectWithValue("Network error");
       }
 
       const data = await res.json();
-      return data as User;
+
+      if (data.isAuthenticated) {
+        return data.user as User;
+      } else {
+        return rejectWithValue("Not authenticated");
+      }
     } catch (err) {
       return rejectWithValue("Request failed");
     }
