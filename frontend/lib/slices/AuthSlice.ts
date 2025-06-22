@@ -31,10 +31,10 @@ export const checkAuth = createAsyncThunk(
         return rejectWithValue("Network error");
       }
 
-      const data = await res.json();
+      const response = await res.json();
 
-      if (data.isAuthenticated) {
-        return data.user as User;
+      if (response.data.isAuthenticated) {
+        return response.data.user as User;
       } else {
         return rejectWithValue("Not authenticated");
       }

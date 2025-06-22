@@ -41,7 +41,11 @@ export function middleware(req: NextRequest) {
   headers.set(headerName, lngInPath || lng);
 
   // If the language is not in the path, redirect to include it
-  if (!lngInPath && !req.nextUrl.pathname.startsWith("/_next")) {
+  if (
+    !lngInPath &&
+    !req.nextUrl.pathname.startsWith("/_next") &&
+    !req.nextUrl.pathname.startsWith("/images")
+  ) {
     return NextResponse.redirect(
       new URL(`/${lng}${req.nextUrl.pathname}${req.nextUrl.search}`, req.url),
     );

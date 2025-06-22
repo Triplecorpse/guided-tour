@@ -57,8 +57,6 @@ export function AbstractPage({ children, state }: Readonly<AbstractPageProps>) {
         return;
       }
 
-      console.log("Success:", response);
-
       if (state === "signup") {
         router.push("/authentication/sign-in");
       } else if (state === "signin") {

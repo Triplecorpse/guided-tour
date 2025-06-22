@@ -5,7 +5,6 @@ import { ROUTES } from "@/config";
 const BACKEND_URL = ROUTES.authentication.check;
 
 export async function GET(req: NextRequest) {
-  console.log(req);
   const res = await fetch(BACKEND_URL, {
     headers: {
       "Content-Type": "application/json",

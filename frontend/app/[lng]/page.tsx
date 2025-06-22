@@ -9,12 +9,13 @@ export async function generateMetadata() {
 
 export default async function Page() {
   const { t } = await getT("main-page");
-  console.log("page is on site");
   return (
     <>
       <AuthInitializer></AuthInitializer>
-      <Header></Header>
-      <main>{t("h1")}</main>
+      <main>
+        <Header></Header>
+        {t("h1")}
+      </main>
     </>
   );
 }
