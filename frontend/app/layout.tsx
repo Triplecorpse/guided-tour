@@ -4,6 +4,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.scss";
 import { EmotionProvider } from "@/providers";
 import StoreProvider from "@/StoreProvider";
+import AuthInitializer from "@/[lng]/components/AuthInitializer";
+import { Header } from "@/[lng]/components/Header/Header";
+import RouteBackground from "@/[lng]/components/RouteBackground/RouteBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +35,17 @@ export default async function Layout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <EmotionProvider>
-          <StoreProvider>{children}</StoreProvider>
-        </EmotionProvider>
+        <main>
+          <EmotionProvider>
+            <StoreProvider>
+              <AuthInitializer></AuthInitializer>
+              <RouteBackground>
+                <Header></Header>
+                {children}
+              </RouteBackground>
+            </StoreProvider>
+          </EmotionProvider>
+        </main>
       </body>
     </html>
   );

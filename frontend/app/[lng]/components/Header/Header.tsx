@@ -8,8 +8,17 @@ export async function Header() {
   return (
     <header>
       <div>Project: GEO</div>
-      <ClientHeader></ClientHeader>
-      <LanguageSelector currentLang={i18n.language} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "8px",
+        }}
+      >
+        <ClientHeader></ClientHeader>
+        <LanguageSelector currentLang={i18n.language} />
+      </div>
     </header>
   );
 }
