@@ -1,13 +1,14 @@
 import { getT } from "@/i18n";
 import ClientHeader from "@/[lng]/components/Header/ClientHeader";
 import LanguageSelector from "@/[lng]/components/Header/LanguageSelector";
+import Link from "next/link";
 
 export async function Header() {
   const { i18n } = await getT("header");
 
   return (
     <header>
-      <div>Project: GEO</div>
+      <Link href="/">Project: GEO</Link>
       <div
         style={{
           display: "flex",

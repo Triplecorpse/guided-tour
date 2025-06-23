@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "@/../lib/slices/AuthSlice";
 import type { RootState } from "@/../lib/store";
 import { useT } from "@/i18n/client";
+import Link from "next/link";
 
 export default function ClientHeader() {
   const dispatch = useDispatch();
@@ -20,7 +21,9 @@ export default function ClientHeader() {
       {state.status === "authenticated" && (
         <div>{state?.user?.name && <div>{state.user.name}</div>}</div>
       )}
-      {state.status !== "authenticated" && <div>{t("login")}</div>}
+      {state.status !== "authenticated" && (
+        <Link href={"/authentication"}>{t("login")}</Link>
+      )}
     </>
   );
 }

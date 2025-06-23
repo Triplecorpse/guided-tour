@@ -4,17 +4,19 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
 const routeBackgrounds: Record<string, string> = {
-  "/login": "/images/pexels-frederic-hancke-113473984-27316080.jpg",
+  authentication: "/images/pexels-frederic-hancke-113473984-27316080.jpg",
   default: "/images/pexels-pixabay-267104.jpg",
 };
 
 function getBackgroundUrl(route: string): string {
-  const arr = route.split("/");
+  const arr = route.split("/").filter(Boolean);
   return routeBackgrounds[arr[1]] ?? routeBackgrounds.default;
 }
 
 export default function RouteBackground({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+
+  console.log(pathname);
 
   // You can do smarter matching (e.g. with regex)
   const background = getBackgroundUrl(pathname);

@@ -1,3 +1,3 @@
-export function Authentication() {
-  return <></>;
+export default function Authentication() {
+  return <>Authentication page works</>;
 }

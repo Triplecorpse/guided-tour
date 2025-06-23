@@ -3,8 +3,8 @@
 import { FormControl, MenuItem, Select } from "@mui/material";
 import { UILanguages } from "@/i18n/settings";
 import Image from "next/image";
-import { useT } from "@/i18n/client";
 import { useChangeLanguage } from "../../../../lib/hooks/useChangeLanguage";
+import { useState, useEffect } from "react";
 
 export default function LanguageSelector({
   currentLang,
@@ -12,13 +12,15 @@ export default function LanguageSelector({
   currentLang: string;
 }) {
   const changeLanguage = useChangeLanguage();
+  const [language, setLanguage] = useState<string>(currentLang);
   const handleChange = (event) => {
     changeLanguage(event.target.value);
+    setLanguage(event.target.value);
   };
 
   return (
     <FormControl className="languageSelector">
-      <Select value={currentLang} onChange={handleChange}>
+      <Select value={language} onChange={handleChange}>
         {UILanguages.map((lang) => (
           <MenuItem key={lang.code} value={lang.code}>
             <div className="languageSelector_option">
