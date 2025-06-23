@@ -1,6 +1,7 @@
 // slices/authSlice.ts
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { ROUTES } from "@/config";
 
 type User = {
   id: string;
@@ -23,15 +24,15 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch("/api/authentication/check", {
-        credentials: "include", // send cookies if needed
+      const res = await fetch(ROUTES.authentication.check, {
+        credentials: "include",
       });
 
       if (!res.ok) {
         return rejectWithValue("Network error");
       }
 
-      const response = await res.json();
+      const response: Record<string, any> = await res.json();
 
       if (response.data.isAuthenticated) {
         return response.data.user as User;

@@ -1,24 +1,26 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "@/../lib/slices/AuthSlice";
 import type { RootState } from "@/../lib/store";
+import { useT } from "@/i18n/client";
 
 export default function ClientHeader() {
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.auth);
-  debugger;
+  const state = useSelector((state: RootState) => state.auth);
+  const { t } = useT("header");
 
   useEffect(() => {
     dispatch(checkAuth());
   }, [dispatch]);
 
   return (
-    <div>
-      {user?.name && <div>{user.name}</div>}
-      {user && <Link href="/personal">personal</Link>}
-    </div>
+    <>
+      {state.status === "authenticated" && (
+        <div>{state?.user?.name && <div>{state.user.name}</div>}</div>
+      )}
+      {state.status !== "authenticated" && <div>{t("login")}</div>}
+    </>
   );
 }

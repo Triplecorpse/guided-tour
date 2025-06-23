@@ -60,7 +60,6 @@ export function AbstractPage({ children, state }: Readonly<AbstractPageProps>) {
       if (state === "signup") {
         router.push("/authentication/sign-in");
       } else if (state === "signin") {
-        console.log(json);
         localStorage.setItem("Auth", json.token);
         router.push("/personal");
       }

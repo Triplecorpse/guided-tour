@@ -1,11 +1,10 @@
-import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Res } from "@nestjs/common";
 import { AuthenticationService } from "./authentication.service";
 import { SignUpDTO } from "./dto/sign-up-dto";
 import { SignInDTO } from "./dto/sign-in-dto";
-import { Response, Request } from "express";
+import { Response } from "express";
 import { Auth } from "./decorators/auth.decorator";
 import { AuthType } from "./enums/auth-type.enum";
-import { Public } from "src/common/decorators/public.decorator";
 
 @Auth(AuthType.None)
 @Controller("authentication")
@@ -31,9 +30,8 @@ export class AuthenticationController {
     return { accessToken };
   }
 
-  @Public()
   @Get("check")
-  check(@Req() req: Request): Promise<{ isAuthenticated: boolean }> {
-    return this.authService.check();
+  check(): Promise<any> {
+    return Promise.resolve({});
   }
 }

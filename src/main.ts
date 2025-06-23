@@ -5,6 +5,7 @@ import { HttpExceptionFilter } from "./common/filters/http-exception/http-except
 import { WrapResponseInterceptor } from "./common/interceptors/wrap-response/wrap-response.interceptor";
 import { TimeoutInterceptor } from "./common/interceptors/timeout/timeout.interceptor";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import * as cookieParser from "cookie-parser";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +21,11 @@ async function bootstrap() {
     new WrapResponseInterceptor(),
     new TimeoutInterceptor(),
   );
+  app.use(cookieParser());
+  app.enableCors({
+    credentials: true,
+    origin: ["http://localhost:3001"],
+  });
 
   const options = new DocumentBuilder()
     .setTitle("Guided Tours")

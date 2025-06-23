@@ -1,5 +1,5 @@
 import { getT } from "@/i18n";
-import { Header } from "@/[lng]/components/Header";
+import { Header } from "@/[lng]/components/Header/Header";
 import AuthInitializer from "@/[lng]/components/AuthInitializer";
 
 export async function generateMetadata() {

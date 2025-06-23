@@ -20,7 +20,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata() {
-  const { t } = await getT("second-page");
+  const { t } = await getT("main-page");
   return {
     title: t("title"),
   };
