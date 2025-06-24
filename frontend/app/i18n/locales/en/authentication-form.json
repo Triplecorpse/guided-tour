@@ -1,0 +1,7 @@
+{
+  "errors": {
+    "required": "The field is required"
+  },
+  "personal": "Personal Account",
+  "login": "Sign in or sign up"
+}

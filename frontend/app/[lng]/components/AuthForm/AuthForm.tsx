@@ -1,6 +1,6 @@
 // components/AuthForm.tsx
-import AuthFormClient from "@/[lng]/components/AuthForm/AuthFormClient";
+import FormProviderWrapper from "@/[lng]/components/AuthForm/FormProviderWrapper";
 
 export default function AuthForm() {
-  return <AuthFormClient />;
+  return <FormProviderWrapper />;
 }
