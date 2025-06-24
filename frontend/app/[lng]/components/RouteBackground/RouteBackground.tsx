@@ -16,8 +16,6 @@ function getBackgroundUrl(route: string): string {
 export default function RouteBackground({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  console.log(pathname);
-
   // You can do smarter matching (e.g. with regex)
   const background = getBackgroundUrl(pathname);
 

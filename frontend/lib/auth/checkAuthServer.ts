@@ -1,4 +1,4 @@
-// lib/auth/checkAuthServer.ts
+// lib/authentication/checkAuthServer.ts
 import { cookies } from "next/headers";
 
 export async function checkAuthServer() {

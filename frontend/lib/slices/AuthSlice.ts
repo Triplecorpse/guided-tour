@@ -19,9 +19,9 @@ const initialState: AuthState = {
   status: "idle",
 };
 
-// ✅ Async thunk to check auth
+// ✅ Async thunk to check authentication
 export const checkAuth = createAsyncThunk(
-  "auth/checkAuth",
+  "authentication/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
       const res = await fetch(ROUTES.authentication.check, {

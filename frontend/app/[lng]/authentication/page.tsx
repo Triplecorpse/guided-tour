@@ -1,3 +1,5 @@
+import AuthForm from "@/[lng]/components/AuthForm/AuthForm";
+
 export default function Authentication() {
-  return <>Authentication page works</>;
+  return <AuthForm />;
 }
