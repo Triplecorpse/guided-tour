@@ -6,6 +6,7 @@ import { WrapResponseInterceptor } from "./common/interceptors/wrap-response/wra
 import { TimeoutInterceptor } from "./common/interceptors/timeout/timeout.interceptor";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import * as cookieParser from "cookie-parser";
+import { AuthExceptionFilter } from "./auth-exception/auth-exception.filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,7 +17,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new HttpExceptionFilter(), new AuthExceptionFilter());
   app.useGlobalInterceptors(
     new WrapResponseInterceptor(),
     new TimeoutInterceptor(),

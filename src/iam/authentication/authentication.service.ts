@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../User";
 import { Repository } from "typeorm";
@@ -13,6 +8,8 @@ import { SignInDTO } from "./dto/sign-in-dto";
 import { ConfigType } from "@nestjs/config";
 import jwtConfig from "../config/jwt.config";
 import { JwtService } from "@nestjs/jwt";
+import { AuthErrorType } from "./enums/auth-error.enum";
+import { AuthException } from "../../auth-exception/AuthException";
 
 @Injectable()
 export class AuthenticationService {
@@ -37,7 +34,12 @@ export class AuthenticationService {
     } catch (e) {
       const pgUniqueViolationErrorCode = "23505";
       if (e.code === pgUniqueViolationErrorCode) {
-        throw new ConflictException(e.detail);
+        throw new AuthException(
+          AuthErrorType.UNIQUE_VIOLATION,
+          { email: dto.email },
+          409,
+          e.detail,
+        );
       }
       throw e;
     }
@@ -46,14 +48,22 @@ export class AuthenticationService {
   async signIn(dto: SignInDTO): Promise<{ accessToken: string }> {
     const user = await this.userRepository.findOneBy({ email: dto.email });
     if (!user) {
-      throw new UnauthorizedException("User does not exist");
+      throw new AuthException(
+        AuthErrorType.USER_NOT_FOUND,
+        { email: dto.email },
+        401,
+      );
     }
     const isEqual = await this.hashingService.compare(
       dto.password,
       user.password,
     );
     if (!isEqual) {
-      throw new UnauthorizedException("Password not match");
+      throw new AuthException(
+        AuthErrorType.PASSWORD_MISMATCH,
+        { email: dto.email },
+        401,
+      );
     }
     const accessToken = await this.jwtService.signAsync(
       {

@@ -24,11 +24,14 @@ const endpoints = {
 
 export default function AuthFormClient() {
   const [mode, setMode] = useState<Mode>("signin");
+  const [formError, setFormError] = useState<string | null>(null);
   const [fetching, setFetching] = useState<boolean>(false);
   const [endpoint, setEndpoint] = useState<string>(
     ROUTES.authentication.signin,
   );
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(
+    null,
+  );
   const [dragging, setDragging] = useState(false);
   const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const boxRef = useRef<HTMLDivElement>(null);
@@ -51,7 +54,7 @@ export default function AuthFormClient() {
     }
   }, [boxRef, position]);
 
-  const { register, formState, handleSubmit } = useFormContext();
+  const { register, formState, handleSubmit, setError } = useFormContext();
 
   const handleSwitch = (newMode: Mode) => setMode(newMode);
 
@@ -61,20 +64,37 @@ export default function AuthFormClient() {
     password?: string;
   }) => {
     setFetching(true);
+    setFormError(null);
     fetch(endpoint, {
       credentials: "include",
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         email: formData.email,
-        name: formData.name,
+        full_name: formData.name,
         password: formData.password,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("fetch successfull", data);
+        console.log("fetch result", data);
+        if (data.error) {
+          const errKey: string = data.message;
+          const errors = Object.keys(data.data);
+          errors.forEach((err: any) => {
+            setError(err.type ?? err, {
+              type: "manual",
+              message: t(`errors.${errKey}`),
+            });
+          });
+          return;
+        }
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err);
+      })
       .finally(() => setFetching(false));
   };
 

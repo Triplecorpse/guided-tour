@@ -1,6 +1,8 @@
 {
   "errors": {
-    "required": "The field is required"
+    "required": "The field is required",
+    "UNIQUE_VIOLATION": "This entry is existing",
+    "VALIDATION_ERROR": "A generic validation error occurred"
   },
   "personal": "Personal Account",
   "login": "Sign in or sign up"
