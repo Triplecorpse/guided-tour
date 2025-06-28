@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -28,12 +28,28 @@ export default function AuthFormClient() {
   const [endpoint, setEndpoint] = useState<string>(
     ROUTES.authentication.signin,
   );
+  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const dragOffset = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const boxRef = useRef<HTMLDivElement>(null);
 
   const { t } = useT("authentication-form");
 
   useEffect(() => {
     setEndpoint(endpoints[mode]);
   }, [mode]);
+
+  useEffect(() => {
+    if (!position && boxRef.current) {
+      const box = boxRef.current;
+      const { innerWidth, innerHeight } = window;
+      const rect = box.getBoundingClientRect();
+      setPosition({
+        x: innerWidth / 2 - rect.width / 2,
+        y: innerHeight / 2 - rect.height / 2,
+      });
+    }
+  }, [boxRef, position]);
 
   const { register, formState, handleSubmit } = useFormContext();
 
@@ -62,16 +78,80 @@ export default function AuthFormClient() {
       .finally(() => setFetching(false));
   };
 
+  const clampPosition = (x: number, y: number) => {
+    if (!boxRef.current) return { x, y };
+    const box = boxRef.current;
+    const { innerWidth, innerHeight } = window;
+    const rect = box.getBoundingClientRect();
+    const minX = 0;
+    const minY = 0;
+    const maxX = innerWidth - rect.width;
+    const maxY = innerHeight - rect.height;
+    return {
+      x: Math.min(Math.max(x, minX), maxX),
+      y: Math.min(Math.max(y, minY), maxY),
+    };
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setDragging(true);
+    if (boxRef.current) {
+      const rect = boxRef.current.getBoundingClientRect();
+      dragOffset.current = {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+    }
+    document.body.style.userSelect = "none";
+  };
+
+  const handleMouseUp = () => {
+    setDragging(false);
+    document.body.style.userSelect = "";
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (dragging) {
+      const unclamped = {
+        x: e.clientX - dragOffset.current.x,
+        y: e.clientY - dragOffset.current.y,
+      };
+      setPosition(clampPosition(unclamped.x, unclamped.y));
+    }
+  };
+
+  useEffect(() => {
+    if (dragging) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    } else {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [dragging]);
+
   return (
     <Box
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      ref={boxRef}
+      onMouseDown={handleMouseDown}
       sx={{
+        position: "absolute",
+        left: position ? position.x : "50%",
+        top: position ? position.y : "50%",
+        transform: position ? "none" : "translate(-50%, -50%)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         px: 2,
         width: 400,
+        cursor: dragging ? "grabbing" : "grab",
+        zIndex: 1300,
       }}
+      className="draggable-auth-form"
     >
       <Paper
         elevation={6}
