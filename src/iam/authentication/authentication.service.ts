@@ -61,7 +61,7 @@ export class AuthenticationService {
     if (!isEqual) {
       throw new AuthException(
         AuthErrorType.PASSWORD_MISMATCH,
-        { email: dto.email },
+        { password: "" },
         401,
       );
     }

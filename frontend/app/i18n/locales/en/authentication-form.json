@@ -2,12 +2,35 @@
   "errors": {
     "required": "The field is required",
     "UNIQUE_VIOLATION": "This entry is existing",
-    "VALIDATION_ERROR": "A generic validation error occurred"
+    "VALIDATION_ERROR": "A generic validation error occurred",
+    "USER_NOT_FOUND": "User not found",
+    "PASSWORD_MISMATCH": "Password does not match"
   },
   "success": {
     "signup": "Account created successfully",
     "forgotPassword": "Password reset instructions have been sent to your email"
   },
-  "personal": "Personal Account",
-  "login": "Sign in or sign up"
+  "titles": {
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "forgot": "Forgot Password"
+  },
+  "descriptions": {
+    "signin": "Welcome back! Please log in.",
+    "signup": "Create a new account below.",
+    "forgot": "Enter your email to receive a reset link."
+  },
+  "fields": {
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password"
+  },
+  "buttons": {
+    "signin": "Sign In",
+    "signup": "Sign Up",
+    "sendResetLink": "Send Reset Link",
+    "toSignin": "Already have an account? Sign In",
+    "toSignup": "Need an account? Sign Up",
+    "toForgot": "Forgot your password?"
+  }
 }

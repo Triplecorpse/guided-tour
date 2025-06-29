@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import {
   Alert,
   Box,
@@ -40,6 +41,7 @@ export default function AuthFormClient() {
   const boxRef = useRef<HTMLDivElement>(null);
 
   const { t } = useT("authentication-form");
+  const router = useRouter();
 
   useEffect(() => {
     setEndpoint(endpoints[mode]);
@@ -96,6 +98,9 @@ export default function AuthFormClient() {
         } else {
           console.log(mode);
           switch (mode) {
+            case "signin":
+              router.push("/personal");
+              break;
             case "signup":
               setSuccessMessage(t("success.signup"));
               resetField("name");
@@ -223,9 +228,7 @@ export default function AuthFormClient() {
           }}
         >
           <Typography variant="h5" textAlign="center" gutterBottom>
-            {mode === "signin" && "Sign In"}
-            {mode === "signup" && "Sign Up"}
-            {mode === "forgot" && "Forgot Password"}
+            {t(`titles.${mode}`)}
           </Typography>
 
           <Typography
@@ -234,24 +237,22 @@ export default function AuthFormClient() {
             mb={3}
             color="text.secondary"
           >
-            {mode === "signin" && "Welcome back! Please log in."}
-            {mode === "signup" && "Create a new account below."}
-            {mode === "forgot" && "Enter your email to receive a reset link."}
+            {t(`descriptions.${mode}`)}
           </Typography>
 
           <Fade in timeout={300} key={mode}>
             <div>
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                onMouseDown={handleFormMouseDown}
                 style={{ display: "flex", flexDirection: "column", gap: 8 }}
                 noValidate
               >
                 {mode === "signup" && (
                   <TextField
                     error={!!formState.errors.name}
+                    onMouseDown={handleFormMouseDown}
                     id="name"
-                    label="Full Name"
+                    label={t("fields.fullName")}
                     {...register("name", {
                       required: t("errors.required"),
                     })}
@@ -264,8 +265,9 @@ export default function AuthFormClient() {
                 )}
                 <TextField
                   error={!!formState.errors.email}
+                  onMouseDown={handleFormMouseDown}
                   id="email"
-                  label="Email"
+                  label={t("fields.email")}
                   type="email"
                   {...register("email", {
                     required: t("errors.required"),
@@ -279,8 +281,9 @@ export default function AuthFormClient() {
                 {(mode === "signin" || mode === "signup") && (
                   <TextField
                     error={!!formState.errors.password}
+                    onMouseDown={handleFormMouseDown}
                     id="password"
-                    label="Password"
+                    label={t("fields.password")}
                     type="password"
                     {...register("password", {
                       required: t("errors.required"),
@@ -298,11 +301,10 @@ export default function AuthFormClient() {
                   variant="contained"
                   fullWidth
                   disabled={fetching}
+                  onMouseDown={handleFormMouseDown}
                   sx={{ mt: 2 }}
                 >
-                  {mode === "signin" && "Sign In"}
-                  {mode === "signup" && "Sign Up"}
-                  {mode === "forgot" && "Send Reset Link"}
+                  {t(`buttons.${mode}`)}
                 </Button>
               </form>
 
@@ -310,31 +312,34 @@ export default function AuthFormClient() {
                 {mode !== "signin" && (
                   <Button
                     className="!text-white"
+                    onMouseDown={handleFormMouseDown}
                     variant="text"
                     size="small"
                     onClick={() => handleSwitch("signin")}
                   >
-                    Already have an account? Sign In
+                    {t("buttons.toSignin")}
                   </Button>
                 )}
                 {mode !== "signup" && (
                   <Button
                     className="!text-white"
+                    onMouseDown={handleFormMouseDown}
                     variant="text"
                     size="small"
                     onClick={() => handleSwitch("signup")}
                   >
-                    Need an account? Sign Up
+                    {t("buttons.toSignup")}
                   </Button>
                 )}
                 {mode !== "forgot" && (
                   <Button
                     className="!text-white"
+                    onMouseDown={handleFormMouseDown}
                     variant="text"
                     size="small"
                     onClick={() => handleSwitch("forgot")}
                   >
-                    Forgot your password?
+                    {t("buttons.toForgot")}
                   </Button>
                 )}
               </Stack>

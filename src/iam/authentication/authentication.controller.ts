@@ -18,6 +18,7 @@ export class AuthenticationController {
     return this.authService.signUp(data);
   }
 
+  @Public()
   @Post("sign-in")
   async signIn(
     @Res({ passthrough: true }) response: Response,
