@@ -15,9 +15,6 @@ export class AuthExceptionFilter implements ExceptionFilter {
     const status = exception.getStatus();
     const exceptionResponse = exception.getResponse() as any;
 
-    console.log(status);
-    console.log(exceptionResponse.message);
-
     // Handle PostgreSQL unique violation
     if (status === 409 && typeof exceptionResponse === "string") {
       const matches = exceptionResponse.match(/Key \((.*?)\)=\((.*?)\)/);

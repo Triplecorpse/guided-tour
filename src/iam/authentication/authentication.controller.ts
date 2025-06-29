@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Post, Res } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
 import { AuthenticationService } from "./authentication.service";
 import { SignUpDTO } from "./dto/sign-up-dto";
 import { SignInDTO } from "./dto/sign-in-dto";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { Auth } from "./decorators/auth.decorator";
 import { AuthType } from "./enums/auth-type.enum";
 import { Public } from "src/common/decorators/public.decorator";
@@ -34,7 +34,11 @@ export class AuthenticationController {
   }
 
   @Get("check")
-  check(): Promise<any> {
-    return Promise.resolve({});
+  check(@Req() req: Request): Promise<any> {
+    // console.log(Object.keys(req));
+    return Promise.resolve({
+      isAuthenticated: !!req["user"],
+      user: req["user"],
+    });
   }
 }

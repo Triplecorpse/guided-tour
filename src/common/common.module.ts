@@ -1,11 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
-import { ApiKeyGuard } from "./guards/api-key/api-key.guard";
-import { APP_GUARD } from "@nestjs/core";
 import { ConfigModule } from "@nestjs/config";
 import { LoggingMiddleware } from "./middleware/logging/logging.middleware";
 
 @Module({
-  providers: [{ provide: APP_GUARD, useClass: ApiKeyGuard }],
+  providers: [],
   imports: [ConfigModule],
 })
 export class CommonModule implements NestModule {

@@ -19,7 +19,11 @@ export default function ClientHeader() {
   return (
     <>
       {state.status === "authenticated" && (
-        <div>{state?.user?.name && <div>{state.user.name}</div>}</div>
+        <div>
+          {state?.user?.name && (
+            <Link href={"/personal"}>{state.user.name}</Link>
+          )}
+        </div>
       )}
       {state.status !== "authenticated" && (
         <Link href={"/authentication"}>{t("login")}</Link>

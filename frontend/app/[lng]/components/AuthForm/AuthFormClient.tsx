@@ -85,7 +85,6 @@ export default function AuthFormClient() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("fetch result", data);
         if (data.error) {
           const errKey: string = data.message;
           const errors = Object.keys(data.data);
@@ -96,7 +95,6 @@ export default function AuthFormClient() {
             });
           });
         } else {
-          console.log(mode);
           switch (mode) {
             case "signin":
               router.push("/personal");

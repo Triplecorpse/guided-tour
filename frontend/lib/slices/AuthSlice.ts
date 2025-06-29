@@ -34,6 +34,8 @@ export const checkAuth = createAsyncThunk(
 
       const response: Record<string, any> = await res.json();
 
+      console.log(response);
+
       if (response.data.isAuthenticated) {
         return response.data.user as User;
       } else {
