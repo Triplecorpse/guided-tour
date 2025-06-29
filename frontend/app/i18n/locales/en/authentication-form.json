@@ -4,6 +4,10 @@
     "UNIQUE_VIOLATION": "This entry is existing",
     "VALIDATION_ERROR": "A generic validation error occurred"
   },
+  "success": {
+    "signup": "Account created successfully",
+    "forgotPassword": "Password reset instructions have been sent to your email"
+  },
   "personal": "Personal Account",
   "login": "Sign in or sign up"
 }

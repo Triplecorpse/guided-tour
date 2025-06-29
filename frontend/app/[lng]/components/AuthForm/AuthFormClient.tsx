@@ -2,10 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import {
+  Alert,
   Box,
   Button,
   Fade,
   Paper,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -25,6 +27,7 @@ const endpoints = {
 export default function AuthFormClient() {
   const [mode, setMode] = useState<Mode>("signin");
   const [formError, setFormError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [fetching, setFetching] = useState<boolean>(false);
   const [endpoint, setEndpoint] = useState<string>(
     ROUTES.authentication.signin,
@@ -54,7 +57,8 @@ export default function AuthFormClient() {
     }
   }, [boxRef, position]);
 
-  const { register, formState, handleSubmit, setError } = useFormContext();
+  const { register, formState, handleSubmit, setError, resetField } =
+    useFormContext();
 
   const handleSwitch = (newMode: Mode) => setMode(newMode);
 
@@ -89,7 +93,23 @@ export default function AuthFormClient() {
               message: t(`errors.${errKey}`),
             });
           });
-          return;
+        } else {
+          console.log(mode);
+          switch (mode) {
+            case "signup":
+              setSuccessMessage(t("success.signup"));
+              resetField("name");
+              resetField("password");
+
+              setMode("signin");
+
+              break;
+            case "forgot":
+              setSuccessMessage(t("success.forgotPassword"));
+              break;
+            default:
+              setSuccessMessage(null);
+          }
         }
       })
       .catch((err) => {
@@ -140,6 +160,14 @@ export default function AuthFormClient() {
     }
   };
 
+  const handleFormMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
+  const handleClose = () => {
+    setSuccessMessage(null);
+  };
+
   useEffect(() => {
     if (dragging) {
       window.addEventListener("mousemove", handleMouseMove);
@@ -155,152 +183,165 @@ export default function AuthFormClient() {
   }, [dragging]);
 
   return (
-    <Box
-      ref={boxRef}
-      onMouseDown={handleMouseDown}
-      sx={{
-        position: "absolute",
-        left: position ? position.x : "50%",
-        top: position ? position.y : "50%",
-        transform: position ? "none" : "translate(-50%, -50%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        px: 2,
-        width: 400,
-        cursor: dragging ? "grabbing" : "grab",
-        zIndex: 1300,
-      }}
-      className="draggable-auth-form"
-    >
-      <Paper
-        elevation={6}
-        sx={{
-          maxWidth: 400,
-          width: "100%",
-          p: 4,
-          borderRadius: 3,
-          backdropFilter: "blur(12px)",
-          backgroundColor: "rgba(255, 255, 255, 0.08)",
-        }}
+    <>
+      <Snackbar
+        open={!!successMessage}
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        onClose={handleClose}
+        message="Note archived"
       >
-        <Typography variant="h5" textAlign="center" gutterBottom>
-          {mode === "signin" && "Sign In"}
-          {mode === "signup" && "Sign Up"}
-          {mode === "forgot" && "Forgot Password"}
-        </Typography>
-
-        <Typography
-          variant="body2"
-          textAlign="center"
-          mb={3}
-          color="text.secondary"
+        <Alert severity="success">{successMessage ?? "Whatever"}</Alert>
+      </Snackbar>
+      <Box
+        ref={boxRef}
+        onMouseDown={handleMouseDown}
+        sx={{
+          position: "absolute",
+          left: position ? position.x : "50%",
+          top: position ? position.y : "50%",
+          transform: position ? "none" : "translate(-50%, -50%)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          px: 2,
+          width: 400,
+          cursor: dragging ? "grabbing" : "grab",
+          zIndex: 1300,
+        }}
+        className="draggable-auth-form"
+      >
+        <Paper
+          elevation={6}
+          sx={{
+            maxWidth: 400,
+            width: "100%",
+            p: 4,
+            borderRadius: 3,
+            backdropFilter: "blur(12px)",
+            backgroundColor: "rgba(255, 255, 255, 0.08)",
+          }}
         >
-          {mode === "signin" && "Welcome back! Please log in."}
-          {mode === "signup" && "Create a new account below."}
-          {mode === "forgot" && "Enter your email to receive a reset link."}
-        </Typography>
+          <Typography variant="h5" textAlign="center" gutterBottom>
+            {mode === "signin" && "Sign In"}
+            {mode === "signup" && "Sign Up"}
+            {mode === "forgot" && "Forgot Password"}
+          </Typography>
 
-        <Fade in timeout={300} key={mode}>
-          <div>
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              style={{ display: "flex", flexDirection: "column", gap: 8 }}
-              noValidate
-            >
-              {mode === "signup" && (
-                <TextField
-                  error={!!formState.errors.name}
-                  id="name"
-                  label="Full Name"
-                  {...register("name", {
-                    required: t("errors.required"),
-                  })}
-                />
-              )}
-              {formState.errors.name && (
-                <p className="text-mui-error text-sm">
-                  {formState.errors.name.message as string}
-                </p>
-              )}
-              <TextField
-                error={!!formState.errors.email}
-                id="email"
-                label="Email"
-                type="email"
-                {...register("email", {
-                  required: t("errors.required"),
-                })}
-              />
-              {formState.errors.email && (
-                <p className="text-mui-error text-sm">
-                  {formState.errors.email.message as string}
-                </p>
-              )}
-              {(mode === "signin" || mode === "signup") && (
-                <TextField
-                  error={!!formState.errors.password}
-                  id="password"
-                  label="Password"
-                  type="password"
-                  {...register("password", {
-                    required: t("errors.required"),
-                  })}
-                />
-              )}
-              {formState.errors.password && (
-                <p className="text-mui-error text-sm">
-                  {formState.errors.password.message as string}
-                </p>
-              )}
+          <Typography
+            variant="body2"
+            textAlign="center"
+            mb={3}
+            color="text.secondary"
+          >
+            {mode === "signin" && "Welcome back! Please log in."}
+            {mode === "signup" && "Create a new account below."}
+            {mode === "forgot" && "Enter your email to receive a reset link."}
+          </Typography>
 
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
+          <Fade in timeout={300} key={mode}>
+            <div>
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                onMouseDown={handleFormMouseDown}
+                style={{ display: "flex", flexDirection: "column", gap: 8 }}
+                noValidate
               >
-                {mode === "signin" && "Sign In"}
-                {mode === "signup" && "Sign Up"}
-                {mode === "forgot" && "Send Reset Link"}
-              </Button>
-            </form>
+                {mode === "signup" && (
+                  <TextField
+                    error={!!formState.errors.name}
+                    id="name"
+                    label="Full Name"
+                    {...register("name", {
+                      required: t("errors.required"),
+                    })}
+                  />
+                )}
+                {formState.errors.name && (
+                  <p className="text-mui-error text-sm">
+                    {formState.errors.name.message as string}
+                  </p>
+                )}
+                <TextField
+                  error={!!formState.errors.email}
+                  id="email"
+                  label="Email"
+                  type="email"
+                  {...register("email", {
+                    required: t("errors.required"),
+                  })}
+                />
+                {formState.errors.email && (
+                  <p className="text-mui-error text-sm">
+                    {formState.errors.email.message as string}
+                  </p>
+                )}
+                {(mode === "signin" || mode === "signup") && (
+                  <TextField
+                    error={!!formState.errors.password}
+                    id="password"
+                    label="Password"
+                    type="password"
+                    {...register("password", {
+                      required: t("errors.required"),
+                    })}
+                  />
+                )}
+                {formState.errors.password && (
+                  <p className="text-mui-error text-sm">
+                    {formState.errors.password.message as string}
+                  </p>
+                )}
 
-            <Stack spacing={1} mt={3} textAlign="center">
-              {mode !== "signin" && (
                 <Button
-                  className="!text-white"
-                  variant="text"
-                  size="small"
-                  onClick={() => handleSwitch("signin")}
+                  type="submit"
+                  variant="contained"
+                  fullWidth
+                  disabled={fetching}
+                  sx={{ mt: 2 }}
                 >
-                  Already have an account? Sign In
+                  {mode === "signin" && "Sign In"}
+                  {mode === "signup" && "Sign Up"}
+                  {mode === "forgot" && "Send Reset Link"}
                 </Button>
-              )}
-              {mode !== "signup" && (
-                <Button
-                  className="!text-white"
-                  variant="text"
-                  size="small"
-                  onClick={() => handleSwitch("signup")}
-                >
-                  Need an account? Sign Up
-                </Button>
-              )}
-              {mode !== "forgot" && (
-                <Button
-                  className="!text-white"
-                  variant="text"
-                  size="small"
-                  onClick={() => handleSwitch("forgot")}
-                >
-                  Forgot your password?
-                </Button>
-              )}
-            </Stack>
-          </div>
-        </Fade>
-      </Paper>
-    </Box>
+              </form>
+
+              <Stack spacing={1} mt={3} textAlign="center">
+                {mode !== "signin" && (
+                  <Button
+                    className="!text-white"
+                    variant="text"
+                    size="small"
+                    onClick={() => handleSwitch("signin")}
+                  >
+                    Already have an account? Sign In
+                  </Button>
+                )}
+                {mode !== "signup" && (
+                  <Button
+                    className="!text-white"
+                    variant="text"
+                    size="small"
+                    onClick={() => handleSwitch("signup")}
+                  >
+                    Need an account? Sign Up
+                  </Button>
+                )}
+                {mode !== "forgot" && (
+                  <Button
+                    className="!text-white"
+                    variant="text"
+                    size="small"
+                    onClick={() => handleSwitch("forgot")}
+                  >
+                    Forgot your password?
+                  </Button>
+                )}
+              </Stack>
+            </div>
+          </Fade>
+        </Paper>
+      </Box>
+    </>
   );
 }
