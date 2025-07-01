@@ -12,6 +12,8 @@ import { AuthErrorType } from "./enums/auth-error.enum";
 import { AuthException } from "../../auth-exception/AuthException";
 import { UserPayload } from "../types/UserPayload";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { randomUUID } from "crypto";
+import { RefreshTokenIdsStorage } from "./refresh-token-ids.storage/refresh-token-ids.storage";
 
 @Injectable()
 export class AuthenticationService {
@@ -22,6 +24,7 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
+    private readonly refreshTokenIds: RefreshTokenIdsStorage,
   ) {}
 
   async signUp(dto: SignUpDTO): Promise<boolean> {
@@ -73,14 +76,22 @@ export class AuthenticationService {
   }
 
   async generateTokens(user: User) {
+    const refreshTokenId = randomUUID();
     const [accessToken, refreshToken]: [string, string] = await Promise.all([
       this.signToken<Partial<UserPayload>>(
         user.id,
         this.jwtConfiguration.accessTokenTtl,
         { email: user.email },
       ),
-      this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl),
+      this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl, {
+        refreshTokenId,
+      }),
     ]);
+    await this.refreshTokenIds.insert(
+      user.id,
+      refreshTokenId,
+      this.jwtConfiguration.refreshTokenTtl,
+    );
     return { accessToken, refreshToken };
   }
 
@@ -102,14 +113,19 @@ export class AuthenticationService {
 
   async refreshTokens(data: RefreshTokenDto) {
     try {
-      const { sub } = await this.jwtService.verifyAsync<
-        Pick<UserPayload, "sub">
+      const { sub, refreshTokenId } = await this.jwtService.verifyAsync<
+        Pick<UserPayload, "sub"> & { refreshTokenId: string }
       >(data.refreshToken, {
         secret: this.jwtConfiguration.secret,
         audience: this.jwtConfiguration.audience,
         issuer: this.jwtConfiguration.issuer,
       });
       const user = await this.userRepository.findOneByOrFail({ id: sub });
+      const isValid = await this.refreshTokenIds.validate(sub!, refreshTokenId);
+      if (!isValid) {
+        throw new Error("Refresh token is invalid");
+      }
+      await this.refreshTokenIds.invalidate(sub!);
       return this.generateTokens(user);
     } catch (error) {
       throw new AuthException(

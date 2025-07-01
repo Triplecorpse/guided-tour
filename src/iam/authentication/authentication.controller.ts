@@ -43,8 +43,22 @@ export class AuthenticationController {
 
   @Public()
   @Post("refresh-tokens")
-  refreshTokens(@Body() data: RefreshTokenDto) {
-    return this.authService.refreshTokens(data);
+  async refreshTokens(
+    @Res({ passthrough: true }) response: Response,
+    @Body() data: RefreshTokenDto,
+  ) {
+    const tokens = await this.authService.refreshTokens(data);
+    response.cookie("accessToken", tokens.accessToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
+    });
+    response.cookie("refreshToken", tokens.refreshToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
+    });
+    return tokens;
   }
 
   @Get("check")
