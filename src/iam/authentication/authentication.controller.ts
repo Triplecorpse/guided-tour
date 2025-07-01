@@ -6,6 +6,9 @@ import { Request, Response } from "express";
 import { Auth } from "./decorators/auth.decorator";
 import { AuthType } from "./enums/auth-type.enum";
 import { Public } from "src/common/decorators/public.decorator";
+import { ActiveUser } from "../decorators/active-user.decorator";
+import { UserPayload } from "../types/UserPayload";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
 
 @Auth(AuthType.None)
 @Controller("authentication")
@@ -23,22 +26,32 @@ export class AuthenticationController {
   async signIn(
     @Res({ passthrough: true }) response: Response,
     @Body() data: SignInDTO,
-  ): Promise<{ accessToken: string }> {
-    const { accessToken } = await this.authService.signIn(data);
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const { accessToken, refreshToken } = await this.authService.signIn(data);
     response.cookie("accessToken", accessToken, {
       secure: true,
       httpOnly: true,
       sameSite: true,
     });
-    return { accessToken };
+    response.cookie("refreshToken", refreshToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: true,
+    });
+    return { accessToken, refreshToken };
+  }
+
+  @Public()
+  @Post("refresh-tokens")
+  refreshTokens(@Body() data: RefreshTokenDto) {
+    return this.authService.refreshTokens(data);
   }
 
   @Get("check")
-  check(@Req() req: Request): Promise<any> {
-    // console.log(Object.keys(req));
+  check(@ActiveUser() user: UserPayload): Promise<any> {
     return Promise.resolve({
-      isAuthenticated: !!req["user"],
-      user: req["user"],
+      isAuthenticated: !!user,
+      user,
     });
   }
 }

@@ -10,6 +10,8 @@ import jwtConfig from "../config/jwt.config";
 import { JwtService } from "@nestjs/jwt";
 import { AuthErrorType } from "./enums/auth-error.enum";
 import { AuthException } from "../../auth-exception/AuthException";
+import { UserPayload } from "../types/UserPayload";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
 
 @Injectable()
 export class AuthenticationService {
@@ -45,7 +47,9 @@ export class AuthenticationService {
     }
   }
 
-  async signIn(dto: SignInDTO): Promise<{ accessToken: string }> {
+  async signIn(
+    dto: SignInDTO,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.userRepository.findOneBy({ email: dto.email });
     if (!user) {
       throw new AuthException(
@@ -65,11 +69,26 @@ export class AuthenticationService {
         401,
       );
     }
+    return await this.generateTokens(user);
+  }
+
+  async generateTokens(user: User) {
+    const [accessToken, refreshToken]: [string, string] = await Promise.all([
+      this.signToken<Partial<UserPayload>>(
+        user.id,
+        this.jwtConfiguration.accessTokenTtl,
+        { email: user.email },
+      ),
+      this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl),
+    ]);
+    return { accessToken, refreshToken };
+  }
+
+  private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
     const accessToken = await this.jwtService.signAsync(
       {
-        sub: user.id,
-        email: user.email,
-        name: user.full_name,
+        sub: userId,
+        ...payload,
       },
       {
         audience: this.jwtConfiguration.audience,
@@ -78,6 +97,26 @@ export class AuthenticationService {
         expiresIn: this.jwtConfiguration.accessTokenTtl,
       },
     );
-    return { accessToken };
+    return accessToken;
+  }
+
+  async refreshTokens(data: RefreshTokenDto) {
+    try {
+      const { sub } = await this.jwtService.verifyAsync<
+        Pick<UserPayload, "sub">
+      >(data.refreshToken, {
+        secret: this.jwtConfiguration.secret,
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+      });
+      const user = await this.userRepository.findOneByOrFail({ id: sub });
+      return this.generateTokens(user);
+    } catch (error) {
+      throw new AuthException(
+        AuthErrorType.INVALID_CREDENTIALS,
+        { refreshToken: data.refreshToken },
+        401,
+      );
+    }
   }
 }
