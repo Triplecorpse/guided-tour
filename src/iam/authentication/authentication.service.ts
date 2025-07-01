@@ -135,4 +135,17 @@ export class AuthenticationService {
       );
     }
   }
+
+  async getUserById(accessToken: string): Promise<User | null> {
+    const payload = await this.jwtService.verifyAsync<Pick<UserPayload, "sub">>(
+      accessToken,
+      {
+        secret: this.jwtConfiguration.secret,
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+      },
+    );
+    const id = payload.sub;
+    return this.userRepository.findOneBy({ id });
+  }
 }
