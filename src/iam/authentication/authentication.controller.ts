@@ -61,11 +61,39 @@ export class AuthenticationController {
     return tokens;
   }
 
+  @Public()
   @Get("check")
-  check(@ActiveUser() user: UserPayload): Promise<any> {
-    return Promise.resolve({
+  async check(
+    @ActiveUser() user: UserPayload,
+    @Res({ passthrough: true }) response: Response,
+    @Req() request: Request,
+  ): Promise<{ isAuthenticated: boolean; user?: UserPayload }> {
+    const refreshToken: string | undefined = request.cookies.refreshToken as
+      | string
+      | undefined;
+    console.log(user, refreshToken);
+    if (!user && refreshToken) {
+      const tokens = await this.authService.refreshTokens({ refreshToken });
+      response.cookie("accessToken", tokens.accessToken, {
+        secure: true,
+        httpOnly: true,
+        sameSite: true,
+      });
+      response.cookie("refreshToken", tokens.refreshToken, {
+        secure: true,
+        httpOnly: true,
+        sameSite: true,
+      });
+
+      return {
+        isAuthenticated: true,
+        user: { name: "Whatever" },
+      };
+    }
+
+    return {
       isAuthenticated: !!user,
       user,
-    });
+    };
   }
 }
