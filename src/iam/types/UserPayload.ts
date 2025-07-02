@@ -6,4 +6,5 @@ export interface UserPayload {
   exp?: number;
   aud?: string;
   iss?: string;
+  role?: string;
 }

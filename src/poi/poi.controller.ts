@@ -21,6 +21,8 @@ import { ApiForbiddenResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
 import { ActiveUser } from "../iam/decorators/active-user.decorator";
 import { UserPayload } from "../iam/types/UserPayload";
+import { Roles } from "../iam/authorization/roles.decorator";
+import { Role } from "../iam/enums/role.enum";
 
 @ApiTags("pois")
 @Controller("poi")
@@ -41,16 +43,19 @@ export class PoiController {
     return this.poiService.find({ id: +id });
   }
 
+  @Roles(Role.Admin)
   @Post()
   create(@Body() buddy: CreatePoiDTO) {
     return this.poiService.create(buddy);
   }
 
+  @Roles(Role.Admin)
   @Patch(":id")
   update(@Param("id") id: number, @Body() buddy: UpdatePoiDTO) {
     return this.poiService.update({ ...buddy, id });
   }
 
+  @Roles(Role.Admin)
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.poiService.remove([+id]);
