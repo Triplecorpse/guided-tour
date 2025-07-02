@@ -1,3 +1,5 @@
+import { PermissionType } from "../authorization/permission.type";
+
 export interface UserPayload {
   sub?: number;
   email?: string;
@@ -7,4 +9,5 @@ export interface UserPayload {
   aud?: string;
   iss?: string;
   role?: string;
+  permissions?: PermissionType[];
 }

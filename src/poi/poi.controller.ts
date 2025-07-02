@@ -21,7 +21,7 @@ import { ApiForbiddenResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
 import { ActiveUser } from "../iam/decorators/active-user.decorator";
 import { UserPayload } from "../iam/types/UserPayload";
-import { Roles } from "../iam/authorization/roles.decorator";
+import { Roles } from "../iam/decorators/roles.decorator";
 import { Role } from "../iam/enums/role.enum";
 
 @ApiTags("pois")
