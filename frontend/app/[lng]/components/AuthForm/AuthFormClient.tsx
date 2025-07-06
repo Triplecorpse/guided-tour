@@ -17,7 +17,8 @@ import { ROUTES } from "@/config";
 import { useFormContext } from "react-hook-form";
 import { useT } from "@/i18n/client";
 import { useDispatch } from "react-redux";
-import { login } from "@/../lib/slices/AuthSlice";
+import { AppDispatch } from "@/../lib/store";
+import { checkAuth } from "@/../lib/slices/AuthSlice";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -44,7 +45,7 @@ export default function AuthFormClient() {
 
   const { t } = useT("authentication-form");
   const router = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
     setEndpoint(endpoints[mode]);
@@ -100,8 +101,10 @@ export default function AuthFormClient() {
         } else {
           switch (mode) {
             case "signin":
-              dispatch(login(data.data));
-              router.push("/personal");
+              // After successful sign-in, check auth to get user data
+              dispatch(checkAuth()).then(() => {
+                router.push("/personal");
+              });
               break;
             case "signup":
               setSuccessMessage(t("success.signup"));

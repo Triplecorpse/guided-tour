@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { checkAuth, logoutThunk } from "@/../lib/slices/AuthSlice";
-import type { RootState } from "@/../lib/store";
+import type { RootState, AppDispatch } from "@/../lib/store";
 import { useT } from "@/i18n/client";
 import {
   FormControl,
@@ -15,14 +15,12 @@ import {
 import { useRouter } from "next/navigation";
 
 export default function ClientHeader() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const state = useSelector((state: RootState) => state.auth);
   const { t } = useT("header");
 
-  useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch]);
+  // Removed duplicate checkAuth call - AuthInitializer handles this
 
   useEffect(() => {
     if (state.status === "unauthenticated") {

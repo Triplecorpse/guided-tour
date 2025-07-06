@@ -41,8 +41,14 @@ export const checkAuth = createAsyncThunk(
 
       const response: Record<string, any> = await res.json();
 
-      if (response.data.isAuthenticated) {
-        return response.data.user as User;
+      if (response.data?.isAuthenticated && response.data?.user) {
+        // Transform the backend user format to frontend format
+        const backendUser = response.data.user;
+        return {
+          id: backendUser.sub || backendUser.id,
+          name: backendUser.name,
+          email: backendUser.email,
+        } as User;
       } else {
         return rejectWithValue("Not authenticated");
       }
