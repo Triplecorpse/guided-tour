@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { checkAuth, logoutThunk } from "@/../lib/slices/AuthSlice";
+import { logoutThunk } from "@/../lib/slices/AuthSlice";
 import type { RootState, AppDispatch } from "@/../lib/store";
 import { useT } from "@/i18n/client";
 import {
@@ -20,18 +19,11 @@ export default function ClientHeader() {
   const state = useSelector((state: RootState) => state.auth);
   const { t } = useT("header");
 
-  // Removed duplicate checkAuth call - AuthInitializer handles this
-
-  useEffect(() => {
-    if (state.status === "unauthenticated") {
-      router.push("/");
-    }
-  }, [state.status]);
-
-  function onChange(event: SelectChangeEvent<string>) {
+  async function onChange(event: SelectChangeEvent<string>) {
     const value = event.target.value;
     if (value === "logout") {
-      dispatch(logoutThunk());
+      await dispatch(logoutThunk());
+      router.push("/");
     } else if (value === "dashboard") {
       router.push("/dashboard");
     }
