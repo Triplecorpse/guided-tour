@@ -2,5 +2,8 @@
   "personal": "Personal Account",
   "login": "Sign in or sign up",
   "dashboard": "Dashboard",
-  "logout": "Logout"
+  "logout": "Logout",
+  "nav": {
+    "users": "Users"
+  }
 }
