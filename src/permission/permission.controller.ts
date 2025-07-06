@@ -28,7 +28,7 @@ export class PermissionController {
   }
 
   @Get(":id")
-  async findOne(@Param("id") id: number): Promise<Permission> {
+  async findOne(@Param("id") id: number): Promise<Permission | null> {
     return this.permissionService.findOne(id);
   }
 
@@ -36,7 +36,7 @@ export class PermissionController {
   async update(
     @Param("id") id: number,
     @Body() permission: Permission,
-  ): Promise<Permission> {
+  ): Promise<Permission | null> {
     return this.permissionService.update(id, permission);
   }
 

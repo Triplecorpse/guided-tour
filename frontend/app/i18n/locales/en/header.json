@@ -1,4 +1,6 @@
 {
   "personal": "Personal Account",
-  "login": "Sign in or sign up"
+  "login": "Sign in or sign up",
+  "dashboard": "Dashboard",
+  "logout": "Logout"
 }

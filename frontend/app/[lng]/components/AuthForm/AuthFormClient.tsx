@@ -16,6 +16,8 @@ import {
 import { ROUTES } from "@/config";
 import { useFormContext } from "react-hook-form";
 import { useT } from "@/i18n/client";
+import { useDispatch } from "react-redux";
+import { login } from "@/../lib/slices/AuthSlice";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -42,6 +44,7 @@ export default function AuthFormClient() {
 
   const { t } = useT("authentication-form");
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setEndpoint(endpoints[mode]);
@@ -97,6 +100,7 @@ export default function AuthFormClient() {
         } else {
           switch (mode) {
             case "signin":
+              dispatch(login(data.data));
               router.push("/personal");
               break;
             case "signup":

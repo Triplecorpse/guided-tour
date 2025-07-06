@@ -19,14 +19,14 @@ export class PermissionService {
     return await this.permissionRepository.find();
   }
 
-  async findOne(id: number): Promise<Permission> {
+  async findOne(id: number): Promise<Permission | null> {
     return await this.permissionRepository.findOne({ where: { id } });
   }
 
   async update(
     id: number,
     permission: Partial<Permission>,
-  ): Promise<Permission> {
+  ): Promise<Permission | null> {
     await this.permissionRepository.update(id, permission);
     return await this.findOne(id);
   }

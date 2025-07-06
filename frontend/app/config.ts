@@ -5,6 +5,7 @@ export const ROUTES = {
     check: API_URL + "/authentication/check",
     signup: API_URL + "/authentication/sign-up",
     signin: API_URL + "/authentication/sign-in",
+    signout: API_URL + "/authentication/sign-out",
     forgot: API_URL + "/authentication/forgot-password",
   },
 };

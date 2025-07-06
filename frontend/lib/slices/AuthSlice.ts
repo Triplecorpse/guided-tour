@@ -14,6 +14,13 @@ type AuthState = {
   status: "idle" | "loading" | "authenticated" | "unauthenticated" | "error";
 };
 
+export const login = createAsyncThunk(
+  "authentication/login",
+  async (userData: User) => {
+    return userData;
+  },
+);
+
 const initialState: AuthState = {
   user: null,
   status: "idle",
@@ -33,8 +40,6 @@ export const checkAuth = createAsyncThunk(
       }
 
       const response: Record<string, any> = await res.json();
-
-      console.log(response);
 
       if (response.data.isAuthenticated) {
         return response.data.user as User;
@@ -68,9 +73,34 @@ const authSlice = createSlice({
       .addCase(checkAuth.rejected, (state) => {
         state.user = null;
         state.status = "unauthenticated";
+      })
+      .addCase(login.fulfilled, (state, action: PayloadAction<User>) => {
+        state.user = action.payload;
+        state.status = "authenticated";
+      })
+      .addCase(logoutThunk.fulfilled, (state) => {
+        state.user = null;
+        state.status = "unauthenticated";
       });
   },
 });
+
+export const logoutThunk = createAsyncThunk(
+  "authentication/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch(ROUTES.authentication.signout, {
+        credentials: "include",
+      });
+      if (!res.ok) {
+        return rejectWithValue("Network error");
+      }
+      return null;
+    } catch (err) {
+      return rejectWithValue("Request failed");
+    }
+  },
+);
 
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;

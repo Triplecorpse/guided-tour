@@ -96,4 +96,20 @@ export class AuthenticationController {
       user: { name: user.name, email: user.email, sub: user.sub },
     };
   }
+
+  @Get("sign-out")
+  logout(@Res({ passthrough: true }) response: Response): null {
+    response.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      path: "/",
+    });
+    response.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      path: "/",
+    });
+
+    return null;
+  }
 }
