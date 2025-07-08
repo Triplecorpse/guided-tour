@@ -15,7 +15,7 @@ export async function Header() {
   };
 
   return (
-    <header>
+    <header className="global-header">
       <div style={flexStyles}>
         <Link href="/">Project: GEO</Link>
         <Divider orientation="vertical" flexItem />

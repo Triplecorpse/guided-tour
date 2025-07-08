@@ -2,5 +2,29 @@
   "tabNames": {
     "users": "Користувачі",
     "roles": "Ролі"
+  },
+  "roleManagement": {
+    "addRole": "Додати роль",
+    "roleName": "Назва ролі",
+    "permissions": "Дозволи",
+    "userPermissions": "Дозволи користувачів",
+    "poiPermissions": "Дозволи POI",
+    "locationPermissions": "Дозволи локацій",
+    "createUser": "Створити користувача",
+    "readUser": "Читати користувача",
+    "updateUser": "Оновити користувача",
+    "deleteUser": "Видалити користувача",
+    "createPoi": "Створити POI",
+    "readPoi": "Читати POI",
+    "updatePoi": "Оновити POI",
+    "deletePoi": "Видалити POI",
+    "createLocation": "Створити локацію",
+    "readLocation": "Читати локацію",
+    "updateLocation": "Оновити локацію",
+    "deleteLocation": "Видалити локацію",
+    "save": "Зберегти",
+    "cancel": "Скасувати",
+    "addRoleTitle": "Додати нову роль",
+    "roleNameRequired": "Назва ролі обов'язкова"
   }
 }

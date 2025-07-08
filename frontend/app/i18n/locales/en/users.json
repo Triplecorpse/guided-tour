@@ -2,5 +2,29 @@
   "tabNames": {
     "users": "Users",
     "roles": "Roles"
+  },
+  "roleManagement": {
+    "addRole": "Add Role",
+    "roleName": "Role Name",
+    "permissions": "Permissions",
+    "userPermissions": "User Permissions",
+    "poiPermissions": "POI Permissions",
+    "locationPermissions": "Location Permissions",
+    "createUser": "Create User",
+    "readUser": "Read User",
+    "updateUser": "Update User",
+    "deleteUser": "Delete User",
+    "createPoi": "Create POI",
+    "readPoi": "Read POI",
+    "updatePoi": "Update POI",
+    "deletePoi": "Delete POI",
+    "createLocation": "Create Location",
+    "readLocation": "Read Location",
+    "updateLocation": "Update Location",
+    "deleteLocation": "Delete Location",
+    "save": "Save",
+    "cancel": "Cancel",
+    "addRoleTitle": "Add New Role",
+    "roleNameRequired": "Role name is required"
   }
 }

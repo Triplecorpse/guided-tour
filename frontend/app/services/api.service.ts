@@ -15,3 +15,11 @@ export function get<T>(url: string, params?: RequestInit): Promise<T> {
     method: "GET",
   });
 }
+
+export function post<T>(url: string, data: any, params?: RequestInit): Promise<T> {
+  return fetchWrapper<T>(url, {
+    ...params,
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
