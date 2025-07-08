@@ -24,7 +24,8 @@
     "dev:front": "cd frontend && next dev --turbopack && cd ../",
     "build:front": "cd frontend && next build && cd ../",
     "start:front": "cd frontend && next start -p 3001 && cd ../",
-    "lint:front": "cd frontend && next lint && cd ../"
+    "lint:front": "cd frontend && next lint && cd ../",
+    "start:all": "concurrently \"npm run start:dev\" \"npm run dev:front\""
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -85,6 +86,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/supertest": "^6.0.2",
+    "concurrently": "^9.2.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",

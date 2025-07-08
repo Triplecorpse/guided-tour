@@ -9,8 +9,13 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: pass123
     volumes:
-      - postgres_data:/var/lib/postgresql/data  # Named volume for PostgreSQL data
-  test-db:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  test-db: # for unit/integration testing purposes
     image: postgis/postgis:latest
     restart: always
     ports:
@@ -40,6 +45,43 @@ services:
       - redis_data:/data
     command: redis-server --appendonly yes
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+  app:
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: pass123
+      DATABASE_NAME: postgres
+      DATABASE_PORT: 5432
+      DATABASE_HOST: db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      API_KEY: whatever
+      PORT: 3001
+      API_PORT: 3000
+      JWT_SECRET: YOUR_SECRET_KEY_HERE
+      JWT_AUDIENCE: localhost:3001
+      JWT_ISSUER: localhost:3001
+      JWT_ACCESS_TOKEN_TTL: 3600
+      JWT_REFRESH_TOKEN_TTL: 86400
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run start:all
+    volumes:
+      - .:/app         # 🟡 mount local dir into container
+      - /app/node_modules  # 🔒 prevent overwriting installed modules
 
 volumes:
   postgres_data:
