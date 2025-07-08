@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Permission } from "./interface/Permission";
+import { UpdatePermissionDto } from "./interface/updatePermissionDto";
 
 @Injectable()
 export class PermissionService {
@@ -25,7 +26,7 @@ export class PermissionService {
 
   async update(
     id: number,
-    permission: Partial<Permission>,
+    permission: Partial<UpdatePermissionDto>,
   ): Promise<Permission | null> {
     await this.permissionRepository.update(id, permission);
     return await this.findOne(id);

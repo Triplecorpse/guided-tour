@@ -23,3 +23,11 @@ export function post<T>(url: string, data: any, params?: RequestInit): Promise<T
     body: JSON.stringify(data),
   });
 }
+
+export function patch<T>(url: string, data: any, params?: RequestInit): Promise<T> {
+  return fetchWrapper<T>(url, {
+    ...params,
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}

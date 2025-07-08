@@ -5,11 +5,12 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Patch,
 } from "@nestjs/common";
 import { Permission } from "./interface/Permission";
 import { PermissionService } from "./permission.service";
 import { CreatePermissionDto } from "./interface/createPermissionDto";
+import { UpdatePermissionDto } from "./interface/updatePermissionDto";
 
 @Controller("permissions")
 export class PermissionController {
@@ -32,10 +33,10 @@ export class PermissionController {
     return this.permissionService.findOne(id);
   }
 
-  @Put(":id")
+  @Patch(":id")
   async update(
     @Param("id") id: number,
-    @Body() permission: Permission,
+    @Body() permission: UpdatePermissionDto,
   ): Promise<Permission | null> {
     return this.permissionService.update(id, permission);
   }

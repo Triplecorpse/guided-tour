@@ -13,5 +13,6 @@ export const ROUTES = {
   },
   roles: {
     list: API_URL + "/permissions",
+    update: (id: number) => API_URL + `/permissions/${id}`,
   },
 };
