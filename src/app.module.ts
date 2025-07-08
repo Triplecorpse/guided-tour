@@ -10,6 +10,7 @@ import { IamModule } from "./iam/iam.module";
 import * as Joi from "joi";
 import * as process from "node:process";
 import appConfig from "./config/app.config";
+import { PermissionModule } from "./permission/permission.module";
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import appConfig from "./config/app.config";
     }),
     PoiModule,
     LocationModule,
+    PermissionModule,
     CommonModule,
     IamModule,
   ],

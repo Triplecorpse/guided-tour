@@ -1,6 +1,9 @@
-import * as React from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Paper from "@mui/material/Paper";
+import { useEffect, useMemo } from "react";
+import { get } from "@/services/api.service";
+import { CreatePermissionDto } from "../../../../../../src/permission/interface/createPermissionDto";
+import { ROUTES } from "@/config";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -34,16 +37,24 @@ const rows = [
   { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
 ];
 
-const paginationModel = { page: 0, pageSize: 5 };
-
 export default function RoleTableClient() {
+  useEffect(() => {
+    get<CreatePermissionDto[]>(ROUTES.roles.list)
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((err) => console.error(err));
+  }, []);
+  const paginationModel = useMemo(() => ({ page: 0, pageSize: 5 }), []);
+  const pageSizeOptions = useMemo(() => [5, 10], []);
   return (
     <Paper sx={{ height: 400, width: "100%" }}>
       <DataGrid
+        key="roleTable"
         rows={rows}
         columns={columns}
         initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[5, 10]}
+        pageSizeOptions={pageSizeOptions}
         checkboxSelection
         sx={{ border: 0 }}
       />

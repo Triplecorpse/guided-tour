@@ -8,4 +8,10 @@ export const ROUTES = {
     signout: API_URL + "/authentication/sign-out",
     forgot: API_URL + "/authentication/forgot-password",
   },
+  users: {
+    list: API_URL + "/users",
+  },
+  roles: {
+    list: API_URL + "/permissions",
+  },
 };

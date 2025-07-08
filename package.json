@@ -21,7 +21,7 @@
     "pretest:e2e": "docker-compose up -d test-db",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "posttest:e2e": "docker-compose stop test-db && docker-compose rm -f test-db",
-    "dev:front": "cd frontend && next dev --turbopack && cd ../",
+    "dev:front": "cd frontend && next dev --turbopack --port 3001 && cd ../",
     "build:front": "cd frontend && next build && cd ../",
     "start:front": "cd frontend && next start -p 3001 && cd ../",
     "lint:front": "cd frontend && next lint && cd ../",
