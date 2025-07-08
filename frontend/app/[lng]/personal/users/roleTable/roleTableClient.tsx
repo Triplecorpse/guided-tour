@@ -2,6 +2,7 @@ import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
 import { get } from "@/services/api.service";
 import { CreatePermissionDto } from "../../../../../../src/permission/interface/createPermissionDto";
+import { Permission } from "../../../../../../src/permission/interface/Permission";
 import { ROUTES } from "@/config";
 import { 
   AppBar, 
@@ -22,22 +23,14 @@ import { Add as AddIcon } from "@mui/icons-material";
 import { useT } from "@/i18n/client";
 import AddRoleModal from "./AddRoleModal";
 
-const rows = [
-  { id: 1, lastName: "Snow", firstName: "Jon", age: 35 },
-  { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42 },
-  { id: 3, lastName: "Lannister", firstName: "Jaime", age: 45 },
-  { id: 4, lastName: "Stark", firstName: "Arya", age: 16 },
-  { id: 5, lastName: "Targaryen", firstName: "Daenerys", age: null },
-  { id: 6, lastName: "Melisandre", firstName: null, age: 150 },
-  { id: 7, lastName: "Clifford", firstName: "Ferrara", age: 44 },
-  { id: 8, lastName: "Frances", firstName: "Rossini", age: 36 },
-  { id: 9, lastName: "Roxie", firstName: "Harvey", age: 65 },
-];
+interface RoleData {
+  data: Permission[];
+}
 
 export default function RoleTableClient() {
   const { t } = useT("users");
   const [modalOpen, setModalOpen] = useState(false);
-  const [roles, setRoles] = useState<CreatePermissionDto[]>([]);
+  const [roles, setRoles] = useState<Permission[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selected, setSelected] = useState<number[]>([]);
@@ -48,8 +41,8 @@ export default function RoleTableClient() {
 
   const fetchRoles = async () => {
     try {
-      const response = await get<CreatePermissionDto[]>(ROUTES.roles.list);
-      setRoles(response);
+      const response = await get<RoleData>(ROUTES.roles.list);
+      setRoles(response.data);
       console.log(response);
     } catch (err) {
       console.error(err);
@@ -79,14 +72,15 @@ export default function RoleTableClient() {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.id);
+      const newSelected = roles.map((n) => n.id);
       setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleCheckboxClick = (event: React.MouseEvent<HTMLButtonElement>, id: number) => {
+    event.stopPropagation();
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
 
@@ -107,6 +101,8 @@ export default function RoleTableClient() {
   };
 
   const isSelected = (id: number) => selected.indexOf(id) !== -1;
+
+  const formatPermissionValue = (value: boolean) => value ? "✓" : "✗";
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -131,41 +127,86 @@ export default function RoleTableClient() {
                 <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
-                    indeterminate={selected.length > 0 && selected.length < rows.length}
-                    checked={rows.length > 0 && selected.length === rows.length}
+                    indeterminate={selected.length > 0 && selected.length < roles.length}
+                    checked={roles.length > 0 && selected.length === roles.length}
                     onChange={handleSelectAllClick}
                   />
                 </TableCell>
                 <TableCell>ID</TableCell>
-                <TableCell>First Name</TableCell>
-                <TableCell>Last Name</TableCell>
-                <TableCell>Age</TableCell>
-                <TableCell>Full Name</TableCell>
+                <TableCell>{t("roleManagement.roleName")}</TableCell>
+                <TableCell>{t("roleManagement.userPermissions")}</TableCell>
+                <TableCell>{t("roleManagement.poiPermissions")}</TableCell>
+                <TableCell>{t("roleManagement.locationPermissions")}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows
+              {roles
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  const isItemSelected = isSelected(row.id);
+                .map((role) => {
+                  const isItemSelected = isSelected(role.id);
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={row.id}
+                      key={role.id}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
-                        <Checkbox color="primary" checked={isItemSelected} />
+                        <Checkbox 
+                          color="primary" 
+                          checked={isItemSelected}
+                          onClick={(event) => handleCheckboxClick(event, role.id)}
+                        />
                       </TableCell>
-                      <TableCell>{row.id}</TableCell>
-                      <TableCell>{row.firstName}</TableCell>
-                      <TableCell>{row.lastName}</TableCell>
-                      <TableCell>{row.age}</TableCell>
-                      <TableCell>{`${row.firstName || ""} ${row.lastName || ""}`}</TableCell>
+                      <TableCell>{role.id}</TableCell>
+                      <TableCell>{role.name}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          <Typography variant="caption">
+                            {t("roleManagement.createUser")}: {formatPermissionValue(role.createUser)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.readUser")}: {formatPermissionValue(role.readUser)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.updateUser")}: {formatPermissionValue(role.updateUser)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.deleteUser")}: {formatPermissionValue(role.deleteUser)}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          <Typography variant="caption">
+                            {t("roleManagement.createPoi")}: {formatPermissionValue(role.createPoi)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.readPoi")}: {formatPermissionValue(role.readPoi)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.updatePoi")}: {formatPermissionValue(role.updatePoi)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.deletePoi")}: {formatPermissionValue(role.deletePoi)}
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                      <TableCell>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                          <Typography variant="caption">
+                            {t("roleManagement.createLocation")}: {formatPermissionValue(role.createLocation)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.readLocation")}: {formatPermissionValue(role.readLocation)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.updateLocation")}: {formatPermissionValue(role.updateLocation)}
+                          </Typography>
+                          <Typography variant="caption">
+                            {t("roleManagement.deleteLocation")}: {formatPermissionValue(role.deleteLocation)}
+                          </Typography>
+                        </Box>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -175,7 +216,7 @@ export default function RoleTableClient() {
         <TablePagination
           rowsPerPageOptions={[5, 10]}
           component="div"
-          count={rows.length}
+          count={roles.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
