@@ -82,6 +82,26 @@ services:
     volumes:
       - .:/app         # 🟡 mount local dir into container
       - /app/node_modules  # 🔒 prevent overwriting installed modules
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - node_modules/
+            - "*.spec.ts"
+            - "*.test.ts"
+        - action: sync
+          path: ./frontend
+          target: /app/frontend
+          ignore:
+            - node_modules/
+            - .next/
+            - dist/
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: Dockerfile
 
 volumes:
   postgres_data:

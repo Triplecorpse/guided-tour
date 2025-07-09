@@ -5,8 +5,6 @@ import "./globals.scss";
 import { EmotionProvider } from "@/providers";
 import StoreProvider from "@/StoreProvider";
 import AuthInitializer from "@/[lng]/components/AuthInitializer";
-import { Header } from "@/[lng]/components/Header/Header";
-import RouteBackground from "@/[lng]/components/RouteBackground/RouteBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,13 +21,13 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata() {
-  const { t } = await getT("main-page");
+  const { t } = await getT("main-page", {});
   return {
     title: t("title"),
   };
 }
 
-export default async function Layout({ children }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body
@@ -39,10 +37,7 @@ export default async function Layout({ children }) {
           <EmotionProvider>
             <StoreProvider>
               <AuthInitializer></AuthInitializer>
-              <RouteBackground>
-                <Header></Header>
-                {children}
-              </RouteBackground>
+              {children}
             </StoreProvider>
           </EmotionProvider>
         </main>
