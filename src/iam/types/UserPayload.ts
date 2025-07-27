@@ -1,4 +1,4 @@
-import { PermissionType } from "../authorization/permission.type";
+import { Permission } from "../../permission/interface/Permission";
 
 export interface UserPayload {
   sub?: number;
@@ -8,6 +8,5 @@ export interface UserPayload {
   exp?: number;
   aud?: string;
   iss?: string;
-  role?: string;
-  permissions?: PermissionType[];
+  permissions?: Permission;
 }

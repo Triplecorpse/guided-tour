@@ -1,7 +1,16 @@
-import { PoiPermission } from "../../poi/poi.permission";
-
-export const Permission = {
-  ...PoiPermission,
-};
-
-export type PermissionType = PoiPermission;
+export enum PermissionType {
+  CreatePOI = "create_poi",
+  UpdatePOI = "update_poi",
+  DeletePOI = "delete_poi",
+  ViewPOI = "view_poi",
+  ManagePOI = "manage_poi",
+  ListPOIs = "list_pois",
+  ExportPOIs = "export_pois",
+  ImportPOIs = "import_pois",
+  ArchivePOI = "archive_poi",
+  RestorePOI = "restore_poi",
+  SharePOI = "share_poi",
+  CommentOnPOI = "comment_on_poi",
+  TagPOI = "tag_poi",
+  RatePOI = "rate_poi",
+}

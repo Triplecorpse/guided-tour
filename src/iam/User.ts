@@ -1,5 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Role } from "./enums/role.enum";
+import {
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from "typeorm";
+import { Permission } from "../permission/interface/Permission";
 
 @Entity("users")
 export class User {
@@ -15,6 +21,7 @@ export class User {
   @Column()
   full_name: string;
 
-  @Column({ enum: Role, default: Role.Regular })
-  role: Role;
+  @ManyToOne(() => Permission, { nullable: false })
+  @JoinColumn({ name: "roleId" })
+  role: Permission;
 }

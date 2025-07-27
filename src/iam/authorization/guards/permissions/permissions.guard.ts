@@ -16,15 +16,17 @@ export class PermissionsGuard implements CanActivate {
     const contextPermissions = this.reflector.getAllAndOverride<
       PermissionType[]
     >(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
+
     if (!contextPermissions) {
       return true;
     }
+
     const user: UserPayload = context.switchToHttp().getRequest()[
       REQUEST_USER_KEY
     ];
 
     return contextPermissions.every((permission) =>
-      user.permissions?.includes(permission),
+      user?.permissions ? user.permissions[permission] === true : false,
     );
   }
 }
