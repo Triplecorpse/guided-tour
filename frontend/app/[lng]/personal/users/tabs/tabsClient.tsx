@@ -6,6 +6,7 @@ import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
 import { useT } from "@/i18n/client";
 import { RoleTable } from "@/[lng]/personal/users/roleTable/roleTable";
+import UserTable from "@/[lng]/personal/users/usersTable/userTable";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -57,7 +58,7 @@ export default function TabsClient() {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        Item One
+        <UserTable></UserTable>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <RoleTable></RoleTable>

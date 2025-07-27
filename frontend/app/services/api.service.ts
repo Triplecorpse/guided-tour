@@ -16,7 +16,11 @@ export function get<T>(url: string, params?: RequestInit): Promise<T> {
   });
 }
 
-export function post<T>(url: string, data: any, params?: RequestInit): Promise<T> {
+export function post<T>(
+  url: string,
+  data: any,
+  params?: RequestInit,
+): Promise<T> {
   return fetchWrapper<T>(url, {
     ...params,
     method: "POST",
@@ -24,7 +28,11 @@ export function post<T>(url: string, data: any, params?: RequestInit): Promise<T
   });
 }
 
-export function patch<T>(url: string, data: any, params?: RequestInit): Promise<T> {
+export function patch<T>(
+  url: string,
+  data: any,
+  params?: RequestInit,
+): Promise<T> {
   return fetchWrapper<T>(url, {
     ...params,
     method: "PATCH",

@@ -1,14 +1,12 @@
 import Paper from "@mui/material/Paper";
 import { useEffect, useState } from "react";
 import { get, patch } from "@/services/api.service";
-import { CreatePermissionDto } from "../../../../../../src/permission/interface/createPermissionDto";
 import { Permission } from "../../../../../../src/permission/interface/Permission";
 import { ROUTES } from "@/config";
-import { 
-  AppBar, 
-  Toolbar, 
-  Button, 
-  Typography, 
+import {
+  AppBar,
+  Toolbar,
+  Button,
   Box,
   Table,
   TableBody,
@@ -19,7 +17,7 @@ import {
   Checkbox,
   TablePagination,
   FormControlLabel,
-  TextField
+  TextField,
 } from "@mui/material";
 import { Add as AddIcon } from "@mui/icons-material";
 import { useT } from "@/i18n/client";
@@ -73,7 +71,9 @@ export default function RoleTableClient() {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -87,7 +87,10 @@ export default function RoleTableClient() {
     setSelected([]);
   };
 
-  const handleCheckboxClick = (event: React.MouseEvent<HTMLButtonElement>, id: number) => {
+  const handleCheckboxClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    id: number,
+  ) => {
     event.stopPropagation();
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
@@ -109,25 +112,27 @@ export default function RoleTableClient() {
   };
 
   const trackChange = (roleId: number, field: keyof Permission, value: any) => {
-    setChanges(prev => ({
+    setChanges((prev) => ({
       ...prev,
       [roleId]: {
         ...prev[roleId],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
-  const handlePermissionChange = async (roleId: number, permissionKey: keyof Permission, newValue: boolean) => {
+  const handlePermissionChange = async (
+    roleId: number,
+    permissionKey: keyof Permission,
+    newValue: boolean,
+  ) => {
     trackChange(roleId, permissionKey, newValue);
-    
+
     // Update local state immediately for responsive UI
-    setRoles(prevRoles => 
-      prevRoles.map(role => 
-        role.id === roleId 
-          ? { ...role, [permissionKey]: newValue }
-          : role
-      )
+    setRoles((prevRoles) =>
+      prevRoles.map((role) =>
+        role.id === roleId ? { ...role, [permissionKey]: newValue } : role,
+      ),
     );
 
     // Debounce the API call
@@ -137,15 +142,13 @@ export default function RoleTableClient() {
   };
 
   const handleNameChange = async (roleId: number, newName: string) => {
-    trackChange(roleId, 'name', newName);
-    
+    trackChange(roleId, "name", newName);
+
     // Update local state immediately
-    setRoles(prevRoles => 
-      prevRoles.map(role => 
-        role.id === roleId 
-          ? { ...role, name: newName }
-          : role
-      )
+    setRoles((prevRoles) =>
+      prevRoles.map((role) =>
+        role.id === roleId ? { ...role, name: newName } : role,
+      ),
     );
 
     // Debounce the API call
@@ -161,9 +164,9 @@ export default function RoleTableClient() {
     setUpdating(roleId);
     try {
       await patch<Permission>(ROUTES.roles.update(roleId), roleChanges);
-      
+
       // Clear changes for this role after successful update
-      setChanges(prev => {
+      setChanges((prev) => {
         const newChanges = { ...prev };
         delete newChanges[roleId];
         return newChanges;
@@ -202,8 +205,12 @@ export default function RoleTableClient() {
                 <TableCell padding="checkbox">
                   <Checkbox
                     color="primary"
-                    indeterminate={selected.length > 0 && selected.length < roles.length}
-                    checked={roles.length > 0 && selected.length === roles.length}
+                    indeterminate={
+                      selected.length > 0 && selected.length < roles.length
+                    }
+                    checked={
+                      roles.length > 0 && selected.length === roles.length
+                    }
                     onChange={handleSelectAllClick}
                   />
                 </TableCell>
@@ -222,41 +229,61 @@ export default function RoleTableClient() {
                   const isUpdating = updating === role.id;
                   const roleChanges = getRoleChanges(role.id);
                   const hasChanges = Object.keys(roleChanges).length > 0;
-                  
+
                   return (
-                    <TableRow
-                      hover
-                      key={role.id}
-                      selected={isItemSelected}
-                    >
+                    <TableRow hover key={role.id} selected={isItemSelected}>
                       <TableCell padding="checkbox">
-                        <Checkbox 
-                          color="primary" 
+                        <Checkbox
+                          color="primary"
                           checked={isItemSelected}
-                          onClick={(event) => handleCheckboxClick(event, role.id)}
+                          onClick={(event) =>
+                            handleCheckboxClick(event, role.id)
+                          }
                         />
                       </TableCell>
                       <TableCell>{role.id}</TableCell>
                       <TableCell>
                         <TextField
                           value={role.name}
-                          onChange={(e) => handleNameChange(role.id, e.target.value)}
+                          onChange={(e) =>
+                            handleNameChange(role.id, e.target.value)
+                          }
                           disabled={isUpdating}
                           size="small"
                           variant="standard"
                           sx={{
-                            '& .MuiInput-underline:before': { borderBottom: hasChanges ? '2px solid #1976d2' : undefined },
-                            '& .MuiInput-underline:after': { borderBottom: hasChanges ? '2px solid #1976d2' : undefined }
+                            "& .MuiInput-underline:before": {
+                              borderBottom: hasChanges
+                                ? "2px solid #1976d2"
+                                : undefined,
+                            },
+                            "& .MuiInput-underline:after": {
+                              borderBottom: hasChanges
+                                ? "2px solid #1976d2"
+                                : undefined,
+                            },
                           }}
                         />
                       </TableCell>
                       <TableCell>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 0.5,
+                          }}
+                        >
                           <FormControlLabel
                             control={
                               <Checkbox
                                 checked={role.createUser}
-                                onChange={(e) => handlePermissionChange(role.id, 'createUser', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "createUser",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -267,7 +294,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.readUser}
-                                onChange={(e) => handlePermissionChange(role.id, 'readUser', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "readUser",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -278,7 +311,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.updateUser}
-                                onChange={(e) => handlePermissionChange(role.id, 'updateUser', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "updateUser",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -289,7 +328,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.deleteUser}
-                                onChange={(e) => handlePermissionChange(role.id, 'deleteUser', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "deleteUser",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -299,12 +344,24 @@ export default function RoleTableClient() {
                         </Box>
                       </TableCell>
                       <TableCell>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 0.5,
+                          }}
+                        >
                           <FormControlLabel
                             control={
                               <Checkbox
                                 checked={role.createPoi}
-                                onChange={(e) => handlePermissionChange(role.id, 'createPoi', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "createPoi",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -315,7 +372,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.readPoi}
-                                onChange={(e) => handlePermissionChange(role.id, 'readPoi', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "readPoi",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -326,7 +389,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.updatePoi}
-                                onChange={(e) => handlePermissionChange(role.id, 'updatePoi', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "updatePoi",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -337,7 +406,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.deletePoi}
-                                onChange={(e) => handlePermissionChange(role.id, 'deletePoi', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "deletePoi",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -347,12 +422,24 @@ export default function RoleTableClient() {
                         </Box>
                       </TableCell>
                       <TableCell>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 0.5,
+                          }}
+                        >
                           <FormControlLabel
                             control={
                               <Checkbox
                                 checked={role.createLocation}
-                                onChange={(e) => handlePermissionChange(role.id, 'createLocation', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "createLocation",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -363,7 +450,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.readLocation}
-                                onChange={(e) => handlePermissionChange(role.id, 'readLocation', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "readLocation",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -374,7 +467,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.updateLocation}
-                                onChange={(e) => handlePermissionChange(role.id, 'updateLocation', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "updateLocation",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
@@ -385,7 +484,13 @@ export default function RoleTableClient() {
                             control={
                               <Checkbox
                                 checked={role.deleteLocation}
-                                onChange={(e) => handlePermissionChange(role.id, 'deleteLocation', e.target.checked)}
+                                onChange={(e) =>
+                                  handlePermissionChange(
+                                    role.id,
+                                    "deleteLocation",
+                                    e.target.checked,
+                                  )
+                                }
                                 disabled={isUpdating}
                                 size="small"
                               />
