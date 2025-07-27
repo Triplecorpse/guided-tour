@@ -11,6 +11,7 @@ import * as Joi from "joi";
 import * as process from "node:process";
 import appConfig from "./config/app.config";
 import { PermissionModule } from "./permission/permission.module";
+import { UserModule } from "./user/user.module";
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { PermissionModule } from "./permission/permission.module";
     PermissionModule,
     CommonModule,
     IamModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Role } from "../../../../../../src/iam/enums/role.enum";
 import { get } from "@/services/api.service";
+import { ROUTES } from "@/config";
 
 type User = {
   id: number;
@@ -21,7 +22,7 @@ export default function UserTableClient() {
   const [loading, setLoading] = useState<boolean>(true);
   const fetchUsers = async () => {
     try {
-      const response = await get<UserData>("/api/users");
+      const response = await get<UserData>(ROUTES.users.list);
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
