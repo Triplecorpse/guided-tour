@@ -25,7 +25,8 @@
     "build:front": "cd frontend && next build && cd ../",
     "start:front": "cd frontend && next start -p 3001 && cd ../",
     "lint:front": "cd frontend && next lint && cd ../",
-    "start:all": "concurrently \"npm run start:dev\" \"npm run dev:front\""
+    "start:all": "concurrently \"npm run start:dev\" \"npm run dev:front\"",
+    "seed": "ts-node src/scripts/seed.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
