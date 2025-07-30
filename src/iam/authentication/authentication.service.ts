@@ -14,25 +14,41 @@ import { UserPayload } from "../types/UserPayload";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
 import { randomUUID } from "crypto";
 import { RefreshTokenIdsStorage } from "./refresh-token-ids.storage/refresh-token-ids.storage";
+import { AppSettingsService } from "../../app-settings/app-settings.service";
+import { Permission } from "../../permission/interface/Permission";
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Permission)
+    private readonly permissionRepository: Repository<Permission>,
     private readonly hashingService: HashingService,
     private readonly jwtService: JwtService,
     @Inject(jwtConfig.KEY)
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly refreshTokenIds: RefreshTokenIdsStorage,
+    private readonly appSettingsService: AppSettingsService,
   ) {}
 
   async signUp(dto: SignUpDTO): Promise<boolean> {
     try {
+      // Get the default role from app settings
+      const defaultRoleSetting = await this.appSettingsService.findByKey('default_role');
+      const defaultRoleId = parseInt(defaultRoleSetting.value);
+      
+      // Get the permission/role
+      const defaultRole = await this.permissionRepository.findOneBy({ id: defaultRoleId });
+      if (!defaultRole) {
+        throw new Error(`Default role with ID ${defaultRoleId} not found`);
+      }
+
       const user = new User();
       user.email = dto.email;
       user.full_name = dto.full_name;
       user.password = await this.hashingService.hash(dto.password);
+      user.role = defaultRole;
 
       await this.userRepository.save(user);
       return true;

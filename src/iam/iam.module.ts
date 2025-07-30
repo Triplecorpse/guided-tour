@@ -13,12 +13,15 @@ import { AuthenticationGuard } from "./authentication/guards/authentication/auth
 import { AccessTokenGuard } from "./authentication/guards/access-token/access-token.guard";
 import { RefreshTokenIdsStorage } from "./authentication/refresh-token-ids.storage/refresh-token-ids.storage";
 import { PermissionsGuard } from "./authorization/guards/permissions/permissions.guard";
+import { Permission } from "../permission/interface/Permission";
+import { AppSettingsModule } from "../app-settings/app-settings.module";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Permission]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
+    AppSettingsModule,
   ],
   providers: [
     {
