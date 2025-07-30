@@ -19,6 +19,8 @@ import { useT } from "@/i18n/client";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/../lib/store";
 import { checkAuth } from "@/../lib/slices/AuthSlice";
+import Divider from "@mui/material/Divider";
+import { post } from "@/services/api.service";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -300,6 +302,40 @@ export default function AuthFormClient() {
                     {formState.errors.password.message as string}
                   </p>
                 )}
+
+                <Box sx={{ my: 2, position: "relative" }}>
+                  <Divider>
+                    <Typography variant="body2" color="text.secondary">
+                      {t("or")}
+                    </Typography>
+                  </Divider>
+                </Box>
+
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  startIcon={
+                    <img
+                      src="https://developers.google.com/identity/images/g-logo.png"
+                      alt="Google"
+                      style={{ width: 18, height: 18 }}
+                    />
+                  }
+                  sx={{
+                    borderColor: "rgba(0, 0, 0, 0.23)",
+                    backgroundColor: "rgba(255, 255, 255)",
+                    color: "text.primary",
+                    textTransform: "none",
+                    mb: 2,
+                  }}
+                  onMouseDown={handleFormMouseDown}
+                  onClick={() => {
+                    post(ROUTES.authentication.google, {token: })
+                    // window.location.href = `${ROUTES.authentication.google}`;
+                  }}
+                >
+                  {t("buttons.google")}
+                </Button>
 
                 <Button
                   type="submit"

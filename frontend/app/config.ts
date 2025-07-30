@@ -7,6 +7,7 @@ export const ROUTES = {
     signin: API_URL + "/authentication/sign-in",
     signout: API_URL + "/authentication/sign-out",
     forgot: API_URL + "/authentication/forgot-password",
+    google: API_URL + "/authentication/google",
   },
   users: {
     list: API_URL + "/users",
