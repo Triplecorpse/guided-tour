@@ -15,11 +15,14 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @Column()
   full_name: string;
+
+  @Column({ nullable: true })
+  googleId: string;
 
   @ManyToOne(() => Permission, { nullable: false })
   @JoinColumn({ name: "roleId" })
