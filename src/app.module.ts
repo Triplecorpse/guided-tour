@@ -12,6 +12,7 @@ import * as process from "node:process";
 import appConfig from "./config/app.config";
 import { PermissionModule } from "./permission/permission.module";
 import { UserModule } from "./user/user.module";
+import { AppSettingsModule } from "./app-settings/app-settings.module";
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { UserModule } from "./user/user.module";
     CommonModule,
     IamModule,
     UserModule,
+    AppSettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
