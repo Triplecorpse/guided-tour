@@ -25,6 +25,7 @@
     "build:front": "cd frontend && next build && cd ../",
     "start:front": "cd frontend && next start -p 3001 && cd ../",
     "lint:front": "cd frontend && next lint && cd ../",
+    "ngrok": "ngrok http --url=working-caribou-vital.ngrok-free.app 3001",
     "start:all": "concurrently \"npm run start:dev\" \"npm run dev:front\"",
     "preseed": "npm run build",
     "seed": "node dist/scripts/seed.js"

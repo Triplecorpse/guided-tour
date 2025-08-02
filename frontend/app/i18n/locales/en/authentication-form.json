@@ -4,7 +4,8 @@
     "UNIQUE_VIOLATION": "This entry is existing",
     "VALIDATION_ERROR": "A generic validation error occurred",
     "USER_NOT_FOUND": "User not found",
-    "PASSWORD_MISMATCH": "Password does not match"
+    "PASSWORD_MISMATCH": "Password does not match",
+    "googleAuth": "Google authentication failed. Please try again."
   },
   "success": {
     "signup": "Account created successfully",

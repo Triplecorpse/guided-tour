@@ -1,10 +1,11 @@
 {
   "errors": {
-    "required": "Поле обов'язкове для вводу",
+    "required": "Поле обов'язкове",
     "UNIQUE_VIOLATION": "Цей запис вже існує",
-    "VALIDATION_ERROR": "Сталась помилка при валідації форми",
+    "VALIDATION_ERROR": "Сталася помилка валідації",
     "USER_NOT_FOUND": "Користувача не знайдено",
-    "PASSWORD_MISMATCH": "Пароль не співпадає"
+    "PASSWORD_MISMATCH": "Пароль не співпадає",
+    "googleAuth": "Помилка автентифікації Google. Спробуйте ще раз."
   },
   "success": {
     "signup": "Реєстрація пройшла успішно",

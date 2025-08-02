@@ -21,6 +21,7 @@ import { AppDispatch } from "@/../lib/store";
 import { checkAuth } from "@/../lib/slices/AuthSlice";
 import Divider from "@mui/material/Divider";
 import { post } from "@/services/api.service";
+import { getGoogleIdToken } from "@/services/googleAuth.service";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -194,6 +195,35 @@ export default function AuthFormClient() {
     };
   }, [dragging]);
 
+  const handleGoogleAuth = async () => {
+    try {
+      setFetching(true);
+      setFormError(null);
+      
+      // Get Google ID token
+      const googleToken = await getGoogleIdToken();
+      
+      // Send token to backend
+      const response = await post(ROUTES.authentication.google, { 
+        token: googleToken 
+      }) as any;
+      
+      if (response.error) {
+        setFormError(t("errors.googleAuth"));
+      } else {
+        // Handle successful authentication
+        dispatch(checkAuth()).then(() => {
+          router.push("/personal");
+        });
+      }
+    } catch (error) {
+      console.error("Google auth error:", error);
+      setFormError(t("errors.googleAuth"));
+    } finally {
+      setFetching(false);
+    }
+  };
+
   return (
     <>
       <Snackbar
@@ -329,10 +359,7 @@ export default function AuthFormClient() {
                     mb: 2,
                   }}
                   onMouseDown={handleFormMouseDown}
-                  onClick={() => {
-                    post(ROUTES.authentication.google, {token: })
-                    // window.location.href = `${ROUTES.authentication.google}`;
-                  }}
+                  onClick={handleGoogleAuth}
                 >
                   {t("buttons.google")}
                 </Button>

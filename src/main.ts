@@ -26,7 +26,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors({
     credentials: true,
-    origin: ["http://localhost:3001"],
+    origin: ["http://localhost:3001", "https://working-caribou-vital.ngrok-free.app"],
   });
 
   const options = new DocumentBuilder()
