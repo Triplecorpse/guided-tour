@@ -43,6 +43,31 @@ export const getGoogleIdToken = (): Promise<string> => {
       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
         reject(new Error('Google Sign-In not available'));
       }
+      
+      // Check if user suppressed the prompt and redirect to classic OAuth
+      if (notification.isSuppressedByUser()) {
+        const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+        
+        if (!clientId) {
+          reject(new Error('Missing NEXT_PUBLIC_GOOGLE_CLIENT_ID environment variable'));
+          return;
+        }
+        
+        const redirectUri = `${window.location.origin}/social/google/redirect`;
+        const scope = 'email profile';
+        const responseType = 'code';
+        
+        const classicOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+          `client_id=${encodeURIComponent(clientId)}&` +
+          `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+          `scope=${encodeURIComponent(scope)}&` +
+          `response_type=${responseType}&` +
+          `access_type=offline&` +
+          `prompt=consent`;
+        
+        window.location.href = classicOAuthUrl;
+        return;
+      }
     });
   });
 }; 
