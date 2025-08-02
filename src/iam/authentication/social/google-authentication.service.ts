@@ -10,6 +10,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../../User";
 import { Repository } from "typeorm";
 import { OAuth2Client } from "google-auth-library";
+import { AppSettings } from "../../../app-settings/interface/AppSettings";
+import { Permission } from "../../../permission/interface/Permission";
 
 @Injectable()
 export class GoogleAuthenticationService implements OnModuleInit {
@@ -19,6 +21,8 @@ export class GoogleAuthenticationService implements OnModuleInit {
     private readonly configService: ConfigService,
     private readonly authService: AuthenticationService,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(AppSettings)
+    private readonly appSettingsRepository: Repository<AppSettings>,
   ) {}
 
   onModuleInit() {
@@ -42,7 +46,20 @@ export class GoogleAuthenticationService implements OnModuleInit {
       if (user) {
         return this.authService.generateTokens(user);
       } else {
-        const newUser = await this.userRepository.save({ email, googleId });
+        const defaultRoleSetting = await this.appSettingsRepository.findOne({
+          where: { key: "default_role" },
+        });
+        if (!defaultRoleSetting) {
+          throw new UnauthorizedException(
+            "Default role setting not found. Please contact support.",
+          );
+        }
+        const newUser = await this.userRepository.save({
+          email,
+          googleId,
+          full_name: payload?.name,
+          role: { id: +defaultRoleSetting.value } as Partial<Permission>,
+        });
         return this.authService.generateTokens(newUser);
       }
     } catch (error) {

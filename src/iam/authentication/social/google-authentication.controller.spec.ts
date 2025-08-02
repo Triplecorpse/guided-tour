@@ -1,7 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { GoogleAuthenticationController } from './google-authentication.controller';
+import { Test, TestingModule } from "@nestjs/testing";
+import { GoogleAuthenticationController } from "./google-authentication.controller";
 
-describe('GoogleAuthenticationController', () => {
+describe("GoogleAuthenticationController", () => {
   let controller: GoogleAuthenticationController;
 
   beforeEach(async () => {
@@ -9,10 +9,12 @@ describe('GoogleAuthenticationController', () => {
       controllers: [GoogleAuthenticationController],
     }).compile();
 
-    controller = module.get<GoogleAuthenticationController>(GoogleAuthenticationController);
+    controller = module.get<GoogleAuthenticationController>(
+      GoogleAuthenticationController,
+    );
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 });

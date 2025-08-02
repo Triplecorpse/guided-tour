@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from "@nestjs/common";
+import { Body, Controller, Post, Res } from "@nestjs/common";
 import { GoogleAuthenticationService } from "./google-authentication.service";
 import { GoogleTokenDto } from "../dto/google-token";
+import { Response } from "express";
 import { Public } from "src/common/decorators/public.decorator";
 
 @Public()
@@ -11,7 +12,23 @@ export class GoogleAuthenticationController {
   ) {}
 
   @Post()
-  authenticate(@Body() tokenDto: GoogleTokenDto) {
-    return this.googleAuthenticationService.authenticate(tokenDto.token);
+  async authenticate(
+    @Body() tokenDto: GoogleTokenDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const tokens = await this.googleAuthenticationService.authenticate(
+      tokenDto.token,
+    );
+    response.cookie("accessToken", tokens.accessToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    });
+    response.cookie("refreshToken", tokens.refreshToken, {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    });
+    return {};
   }
 }

@@ -199,15 +199,15 @@ export default function AuthFormClient() {
     try {
       setFetching(true);
       setFormError(null);
-      
+
       // Get Google ID token
       const googleToken = await getGoogleIdToken();
-      
+
       // Send token to backend
-      const response = await post(ROUTES.authentication.google, { 
-        token: googleToken 
-      }) as any;
-      
+      const response = (await post(ROUTES.authentication.google, {
+        token: googleToken,
+      })) as any;
+
       if (response.error) {
         setFormError(t("errors.googleAuth"));
       } else {

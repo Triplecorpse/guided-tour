@@ -15,10 +15,13 @@ import { RefreshTokenIdsStorage } from "./authentication/refresh-token-ids.stora
 import { PermissionsGuard } from "./authorization/guards/permissions/permissions.guard";
 import { Permission } from "../permission/interface/Permission";
 import { AppSettingsModule } from "../app-settings/app-settings.module";
+import { GoogleAuthenticationController } from "./authentication/social/google-authentication.controller";
+import { GoogleAuthenticationService } from "./authentication/social/google-authentication.service";
+import { AppSettings } from "../app-settings/interface/AppSettings";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Permission]),
+    TypeOrmModule.forFeature([User, Permission, AppSettings]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     AppSettingsModule,
@@ -39,7 +42,8 @@ import { AppSettingsModule } from "../app-settings/app-settings.module";
     AccessTokenGuard,
     RefreshTokenIdsStorage,
     AuthenticationService,
+    GoogleAuthenticationService,
   ],
-  controllers: [AuthenticationController],
+  controllers: [AuthenticationController, GoogleAuthenticationController],
 })
 export class IamModule {}

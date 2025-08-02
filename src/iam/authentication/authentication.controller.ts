@@ -71,6 +71,7 @@ export class AuthenticationController {
     const refreshToken: string | undefined = request.cookies.refreshToken as
       | string
       | undefined;
+    console.log(refreshToken);
     if (!user && refreshToken) {
       const tokens = await this.authService.refreshTokens({ refreshToken });
       response.cookie("accessToken", tokens.accessToken, {
@@ -93,7 +94,7 @@ export class AuthenticationController {
 
     return {
       isAuthenticated: !!user,
-      user: { name: user.name, email: user.email, sub: user.sub },
+      user: { name: user?.name, email: user?.email, sub: user?.sub },
     };
   }
 

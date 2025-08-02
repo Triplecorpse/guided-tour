@@ -35,11 +35,14 @@ export class AuthenticationService {
   async signUp(dto: SignUpDTO): Promise<boolean> {
     try {
       // Get the default role from app settings
-      const defaultRoleSetting = await this.appSettingsService.findByKey('default_role');
+      const defaultRoleSetting =
+        await this.appSettingsService.findByKey("default_role");
       const defaultRoleId = parseInt(defaultRoleSetting.value);
-      
+
       // Get the permission/role
-      const defaultRole = await this.permissionRepository.findOneBy({ id: defaultRoleId });
+      const defaultRole = await this.permissionRepository.findOneBy({
+        id: defaultRoleId,
+      });
       if (!defaultRole) {
         throw new Error(`Default role with ID ${defaultRoleId} not found`);
       }
