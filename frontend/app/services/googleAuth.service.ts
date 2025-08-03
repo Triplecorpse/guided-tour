@@ -87,6 +87,7 @@ export const getGoogleIdToken = (): Promise<string> => {
           `access_type=offline&` +
           `prompt=consent`;
 
+        // TODO: use Navigator API if available
         window.location.href = classicOAuthUrl;
         return;
       }

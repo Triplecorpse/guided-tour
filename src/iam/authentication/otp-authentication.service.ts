@@ -1,14 +1,15 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { Repository } from "typeorm";
 import { User } from "../User";
 import { authenticator } from "otplib";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class OtpAuthenticationService {
   constructor(
     private readonly configService: ConfigService,
-    @Inject(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
   generateSecret(email: string): { uri: string; secret: string } {

@@ -20,9 +20,9 @@ export default function GoogleRedirectPage() {
     const handleGoogleCallback = async () => {
       try {
         // Get the authorization code from URL parameters
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
-        const error = searchParams.get('error');
+        const code = searchParams.get("code");
+        const state = searchParams.get("state");
+        const error = searchParams.get("error");
 
         // Check for OAuth errors
         if (error) {
@@ -32,19 +32,18 @@ export default function GoogleRedirectPage() {
         }
 
         if (!code) {
-          setError('No authorization code received');
+          setError("No authorization code received");
           setLoading(false);
           return;
         }
 
         // Send the authorization code to your backend
-        const response = await post(ROUTES.authentication.google, {
+        const response = (await post(ROUTES.authentication.google, {
           code: code,
-          state: state
-        }) as any;
+        })) as any;
 
         if (response.error) {
-          setError(response.message || 'Authentication failed');
+          setError(response.message || "Authentication failed");
         } else {
           // Handle successful authentication
           await dispatch(checkAuth());
@@ -52,7 +51,7 @@ export default function GoogleRedirectPage() {
         }
       } catch (error) {
         console.error("Google OAuth error:", error);
-        setError('Authentication failed. Please try again.');
+        setError("Authentication failed. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -99,9 +98,9 @@ export default function GoogleRedirectPage() {
         <Typography variant="body1" color="text.secondary" textAlign="center">
           {error}
         </Typography>
-        <Typography 
-          variant="body2" 
-          color="primary" 
+        <Typography
+          variant="body2"
+          color="primary"
           sx={{ cursor: "pointer", textDecoration: "underline" }}
           onClick={() => router.push("/authentication")}
         >
@@ -112,4 +111,4 @@ export default function GoogleRedirectPage() {
   }
 
   return null;
-} 
+}

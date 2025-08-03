@@ -18,6 +18,7 @@ import { AppSettingsModule } from "../app-settings/app-settings.module";
 import { GoogleAuthenticationController } from "./authentication/social/google-authentication.controller";
 import { GoogleAuthenticationService } from "./authentication/social/google-authentication.service";
 import { AppSettings } from "../app-settings/interface/AppSettings";
+import { OtpAuthenticationService } from "./authentication/otp-authentication.service";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AppSettings } from "../app-settings/interface/AppSettings";
     RefreshTokenIdsStorage,
     AuthenticationService,
     GoogleAuthenticationService,
+    OtpAuthenticationService,
   ],
   controllers: [AuthenticationController, GoogleAuthenticationController],
 })

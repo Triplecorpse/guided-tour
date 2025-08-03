@@ -28,7 +28,8 @@ export class GoogleAuthenticationService implements OnModuleInit {
   onModuleInit() {
     const clientId = this.configService.get<string>("GOOGLE_CLIENT_ID");
     const clientSecret = this.configService.get<string>("GOOGLE_CLIENT_SECRET");
-    this.oauth2Client = new OAuth2Client(clientId, clientSecret);
+    const redirectUri = this.configService.get<string>("GOOGLE_CLIENT_SECRET");
+    this.oauth2Client = new OAuth2Client(clientId, clientSecret, redirectUri);
   }
 
   async authenticate(token: string) {
@@ -69,6 +70,21 @@ export class GoogleAuthenticationService implements OnModuleInit {
       } else {
         throw new UnauthorizedException();
       }
+    }
+  }
+
+  async handleGoogleRedirect(code: string) {
+    try {
+      const { tokens } = await this.oauth2Client.getToken(code);
+      if (tokens.id_token) {
+        return this.authenticate(tokens.id_token);
+      } else {
+        throw new UnauthorizedException("Invalid Google token");
+      }
+    } catch (error) {
+      console.log(error.response?.data);
+
+      throw new Error(error.response?.data ?? "Invalid Google token");
     }
   }
 }

@@ -1,4 +1,10 @@
-import { Body, Controller, Post, Res } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Post,
+  Res,
+} from "@nestjs/common";
 import { GoogleAuthenticationService } from "./google-authentication.service";
 import { GoogleTokenDto } from "../dto/google-token";
 import { Response } from "express";
@@ -16,9 +22,21 @@ export class GoogleAuthenticationController {
     @Body() tokenDto: GoogleTokenDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const tokens = await this.googleAuthenticationService.authenticate(
-      tokenDto.token,
-    );
+    let tokens: {
+      accessToken: string;
+      refreshToken: string;
+    };
+    if (tokenDto.token) {
+      tokens = await this.googleAuthenticationService.authenticate(
+        tokenDto.token,
+      );
+    } else if (tokenDto.code) {
+      tokens = await this.googleAuthenticationService.handleGoogleRedirect(
+        tokenDto.code,
+      );
+    } else {
+      return { ok: false };
+    }
     response.cookie("accessToken", tokens.accessToken, {
       secure: true,
       httpOnly: true,

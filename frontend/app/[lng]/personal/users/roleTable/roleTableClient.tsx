@@ -49,7 +49,6 @@ export default function RoleTableClient() {
     try {
       const response = await get<RoleData>(ROUTES.roles.list);
       setRoles(response.data);
-      console.log(response);
     } catch (err) {
       console.error(err);
     }
