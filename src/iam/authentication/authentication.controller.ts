@@ -9,11 +9,16 @@ import { Public } from "src/common/decorators/public.decorator";
 import { ActiveUser } from "../decorators/active-user.decorator";
 import { UserPayload } from "../types/UserPayload";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
+import { OtpAuthenticationService } from "./otp-authentication.service";
+import { toFileStream } from "qrcode";
 
 @Auth(AuthType.None)
 @Controller("authentication")
 export class AuthenticationController {
-  constructor(private readonly authService: AuthenticationService) {}
+  constructor(
+    private readonly authService: AuthenticationService,
+    private readonly otpAuthenticationService: OtpAuthenticationService,
+  ) {}
 
   @Public()
   @Post("sign-up")
@@ -112,5 +117,21 @@ export class AuthenticationController {
     });
 
     return null;
+  }
+
+  @Post("2fa/generate-secret")
+  async generateQRCode(
+    @ActiveUser() activeUser: UserPayload,
+    @Res() response: Response,
+  ) {
+    const { uri, secret } = this.otpAuthenticationService.generateSecret(
+      activeUser.email!,
+    );
+    await this.otpAuthenticationService.enableTFAForUser(
+      activeUser.email!,
+      secret,
+    );
+    response.type("image/png");
+    return toFileStream(response, uri);
   }
 }

@@ -16,6 +16,7 @@ import { randomUUID } from "crypto";
 import { RefreshTokenIdsStorage } from "./refresh-token-ids.storage/refresh-token-ids.storage";
 import { AppSettingsService } from "../../app-settings/app-settings.service";
 import { Permission } from "../../permission/interface/Permission";
+import { OtpAuthenticationService } from "./otp-authentication.service";
 
 @Injectable()
 export class AuthenticationService {
@@ -30,6 +31,7 @@ export class AuthenticationService {
     private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
     private readonly refreshTokenIds: RefreshTokenIdsStorage,
     private readonly appSettingsService: AppSettingsService,
+    private readonly otpAuthenticationService: OtpAuthenticationService,
   ) {}
 
   async signUp(dto: SignUpDTO): Promise<boolean> {
@@ -90,6 +92,19 @@ export class AuthenticationService {
         { password: "" },
         401,
       );
+    }
+    if (user.isTFAEnabled) {
+      const isValid = this.otpAuthenticationService.verifyCode(
+        dto.tfaCode!,
+        user.TFASecret,
+      );
+      if (!isValid) {
+        throw new AuthException(
+          AuthErrorType.INVALID_CREDENTIALS,
+          { tfaCode: dto.tfaCode },
+          401,
+        );
+      }
     }
     return await this.generateTokens(user);
   }
