@@ -2,6 +2,7 @@
   "personal": "Personal Account",
   "login": "Sign in or sign up",
   "dashboard": "Dashboard",
+  "profile": "Profile Settings",
   "logout": "Logout",
   "nav": {
     "users": "Users"

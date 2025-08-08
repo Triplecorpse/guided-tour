@@ -81,12 +81,12 @@ export class AuthenticationController {
       response.cookie("accessToken", tokens.accessToken, {
         secure: true,
         httpOnly: true,
-        sameSite: true,
+        sameSite: "none",
       });
       response.cookie("refreshToken", tokens.refreshToken, {
         secure: true,
         httpOnly: true,
-        sameSite: true,
+        sameSite: "none",
       });
 
       const user = await this.authService.getUserById(tokens.accessToken);

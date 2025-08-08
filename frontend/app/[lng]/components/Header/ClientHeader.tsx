@@ -26,6 +26,8 @@ export default function ClientHeader() {
       router.push("/");
     } else if (value === "dashboard") {
       router.push("/dashboard");
+    } else if (value === "profile") {
+      router.push("/personal/profile");
     }
   }
 
@@ -39,6 +41,7 @@ export default function ClientHeader() {
                 <MenuItem value="" disabled>
                   {state.user.name}
                 </MenuItem>
+                <MenuItem value="profile">{t("profile")}</MenuItem>
                 <MenuItem value="dashboard">{t("dashboard")}</MenuItem>
                 <MenuItem value="logout">{t("logout")}</MenuItem>
               </Select>
