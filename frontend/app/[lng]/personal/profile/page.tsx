@@ -3,22 +3,25 @@
 import React, { useState } from "react";
 import { useT } from "@/i18n/client";
 import {
+  Alert,
   Box,
-  TextField,
   Button,
+  CircularProgress,
   Divider,
-  Switch,
   FormControlLabel,
-  Typography,
+  Grid,
   ListItemButton,
   ListItemText,
-  Stack,
-  Grid,
   Modal,
+  Stack,
+  Switch,
+  TextField,
+  Typography,
 } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
 import GoogleAuthButton from "@/[lng]/components/GoogleAuthButton/GoogleAuthButton";
 import { ROUTES } from "@/config";
+import { post } from "@/services/api.service";
 
 export default function ProfilePage() {
   const methods = useForm();
@@ -26,6 +29,8 @@ export default function ProfilePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationError, setVerificationError] = useState<string>("");
 
   const handle2FAToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isEnabled = event.target.checked;
@@ -53,6 +58,37 @@ export default function ProfilePage() {
           methods.setValue("enable2fa", false);
         }
       })();
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (verificationCode.length !== 6) return;
+
+    setIsVerifying(true);
+    setVerificationError("");
+
+    try {
+      const result = await post(ROUTES.authentication.verify2fa, {
+        body: JSON.stringify({ code: verificationCode }),
+      });
+
+      console.log(result);
+
+      if (!result.error) {
+        setIsModalOpen(false);
+        setVerificationCode("");
+        if (qrCodeUrl) {
+          URL.revokeObjectURL(qrCodeUrl);
+          setQrCodeUrl("");
+        }
+      } else {
+        setVerificationError(t("messages.verificationError"));
+      }
+    } catch (error) {
+      console.error("Error verifying 2FA code:", error);
+      setVerificationError(t("messages.verificationError"));
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -132,6 +168,7 @@ export default function ProfilePage() {
           onClose={() => {
             setIsModalOpen(false);
             setVerificationCode("");
+            setVerificationError("");
             if (qrCodeUrl) {
               URL.revokeObjectURL(qrCodeUrl);
               setQrCodeUrl("");
@@ -154,7 +191,7 @@ export default function ProfilePage() {
             <Typography variant="h6" component="h2" gutterBottom>
               {t("titles.setup2fa")}
             </Typography>
-            <Typography variant="body2" gutterBottom>
+            <Typography variant="body2" sx={{ mb: 2 }}>
               {t("messages.scan2faCode")}
             </Typography>
             {qrCodeUrl && (
@@ -166,7 +203,7 @@ export default function ProfilePage() {
                 />
               </Box>
             )}
-            <Typography variant="body2" gutterBottom>
+            <Typography variant="body2" sx={{ mb: 2 }}>
               {t("messages.enterCode")}
             </Typography>
             <TextField
@@ -181,19 +218,25 @@ export default function ProfilePage() {
               placeholder="000000"
               sx={{ mt: 2, mb: 2 }}
             />
+            {/* Reserved space for error message to prevent UI jumping */}
+            <Box sx={{ minHeight: 48, mb: 2 }}>
+              {verificationError && (
+                <Alert severity="error" sx={{ mt: 1 }}>
+                  {verificationError}
+                </Alert>
+              )}
+            </Box>
             <Button
               variant="contained"
               fullWidth
-              onClick={() => {
-                setIsModalOpen(false);
-                setVerificationCode("");
-                if (qrCodeUrl) {
-                  URL.revokeObjectURL(qrCodeUrl);
-                  setQrCodeUrl("");
-                }
-              }}
+              disabled={verificationCode.length !== 6 || isVerifying}
+              onClick={() => void handleVerifyCode()}
             >
-              {t("buttons.close")}
+              {isVerifying ? (
+                <CircularProgress size={24} color="inherit" />
+              ) : (
+                t("buttons.close")
+              )}
             </Button>
           </Box>
         </Modal>

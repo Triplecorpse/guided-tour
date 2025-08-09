@@ -20,7 +20,9 @@ export class OtpAuthenticationService {
   }
 
   verifyCode(code: string, secret: string): boolean {
-    return authenticator.verify({ token: code, secret });
+    const secretDecoded = secret;
+
+    return authenticator.verify({ token: code, secret: secretDecoded });
   }
 
   async enableTFAForUser(email: string, secret: string) {
@@ -29,10 +31,11 @@ export class OtpAuthenticationService {
       select: { id: true },
     });
 
+    const secretEncoded = secret;
+
     await this.userRepository.update(
       { id },
-      // TODO: encode the secret in base32 format
-      { TFASecret: secret, isTFAEnabled: true },
+      { TFASecret: secretEncoded, isTFAEnabled: true },
     );
   }
 }
