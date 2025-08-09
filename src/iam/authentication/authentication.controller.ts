@@ -147,17 +147,15 @@ export class AuthenticationController {
   async verifyCode(
     @ActiveUser() activeUser: UserPayload,
     @Req() request: Request,
-    @Res() response: Response,
+    @Res({ passthrough: true }) response: Response,
     @Body() { code }: { code: string },
   ): Promise<{ isValid: boolean }> {
     try {
       const user = await this.authService.getUserByEmail(activeUser.email!);
-      console.log(user);
       const isValid = this.otpAuthenticationService.verifyCode(
         code,
         user.TFASecret,
       );
-      console.log(isValid);
       if (!isValid) {
         throw new UnauthorizedException("Invalid 2FA code");
       }
@@ -166,7 +164,6 @@ export class AuthenticationController {
         await this.authService.generateTokens(user, {
           isTFAAuthorised: true,
         });
-      console.log(accessToken, refreshToken);
 
       response.cookie("accessToken", accessToken, {
         secure: true,
@@ -178,8 +175,6 @@ export class AuthenticationController {
         httpOnly: true,
         sameSite: "none",
       });
-
-      console.log("return");
 
       return { isValid: true };
     } catch (error) {

@@ -69,7 +69,7 @@ export default function ProfilePage() {
 
     try {
       const result = await post(ROUTES.authentication.verify2fa, {
-        body: JSON.stringify({ code: verificationCode }),
+        code: verificationCode,
       });
 
       console.log(result);

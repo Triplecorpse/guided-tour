@@ -22,7 +22,10 @@ export class OtpAuthenticationService {
   verifyCode(code: string, secret: string): boolean {
     const secretDecoded = secret;
 
-    return authenticator.verify({ token: code, secret: secretDecoded });
+    return authenticator.verify({
+      token: code,
+      secret: secretDecoded,
+    });
   }
 
   async enableTFAForUser(email: string, secret: string) {
