@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "securitySettings": "Налаштування безпеки"
+  },
+  "titles": {
+    "securitySettings": "Налаштування безпеки"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Пароль",
+    "enable2fa": "Увімкнути 2FA"
+  },
+  "buttons": {
+    "set": "Встановити",
+    "google": "Увійти через Google"
+  }
+}

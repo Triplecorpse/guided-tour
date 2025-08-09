@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "securitySettings": "Security settings"
+  },
+  "titles": {
+    "securitySettings": "Security settings"
+  },
+  "fields": {
+    "email": "Email",
+    "password": "Password",
+    "enable2fa": "Enable 2FA"
+  },
+  "buttons": {
+    "set": "Set",
+    "google": "Sign in with Google"
+  }
+}
