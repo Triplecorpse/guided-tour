@@ -9,4 +9,5 @@ export interface UserPayload {
   aud?: string;
   iss?: string;
   permissions?: Permission;
+  isTFARequired?: boolean;
 }

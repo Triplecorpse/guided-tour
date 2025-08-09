@@ -8,6 +8,8 @@ export const ROUTES = {
     signout: API_URL + "/authentication/sign-out",
     forgot: API_URL + "/authentication/forgot-password",
     google: API_URL + "/authentication/google",
+    generateSecret: API_URL + "/authentication/2fa/generate-secret",
+    verify2fa: API_URL + "/authentication/2fa/verify",
   },
   users: {
     list: API_URL + "/users",

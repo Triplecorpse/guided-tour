@@ -45,7 +45,7 @@ export class GoogleAuthenticationService implements OnModuleInit {
       });
 
       if (user) {
-        return this.authService.generateTokens(user);
+        return this.authService.generateTokens(user, { isTFAAuthorised: true });
       } else {
         const defaultRoleSetting = await this.appSettingsRepository.findOne({
           where: { key: "default_role" },

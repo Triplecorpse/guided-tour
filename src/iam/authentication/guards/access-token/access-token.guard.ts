@@ -33,6 +33,9 @@ export class AccessTokenGuard implements CanActivate {
         token,
         this.jwtConfiguration,
       );
+      if (payload.isTFARequired) {
+        throw new UnauthorizedException("TFA is required");
+      }
       request[REQUEST_USER_KEY] = payload;
     } catch (e) {
       throw new UnauthorizedException(e);

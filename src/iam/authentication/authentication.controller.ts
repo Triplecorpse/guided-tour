@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { AuthenticationService } from "./authentication.service";
 import { SignUpDTO } from "./dto/sign-up-dto";
 import { SignInDTO } from "./dto/sign-in-dto";
@@ -31,19 +39,22 @@ export class AuthenticationController {
   async signIn(
     @Res({ passthrough: true }) response: Response,
     @Body() data: SignInDTO,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const { accessToken, refreshToken } = await this.authService.signIn(data);
+  ): Promise<{ isTFARequired: boolean }> {
+    const { accessToken, refreshToken, isTFARequired } =
+      await this.authService.signIn(data);
+
     response.cookie("accessToken", accessToken, {
       secure: true,
       httpOnly: true,
-      sameSite: true,
+      sameSite: "none",
     });
     response.cookie("refreshToken", refreshToken, {
       secure: true,
       httpOnly: true,
-      sameSite: true,
+      sameSite: "none",
     });
-    return { accessToken, refreshToken };
+
+    return { isTFARequired };
   }
 
   @Public()
@@ -89,7 +100,7 @@ export class AuthenticationController {
         sameSite: "none",
       });
 
-      const user = await this.authService.getUserById(tokens.accessToken);
+      const user = await this.authService.getUserByToken(tokens.accessToken);
       return {
         isAuthenticated: !!user,
         user: { name: user?.full_name, sub: user?.id, email: user?.email },
@@ -107,12 +118,10 @@ export class AuthenticationController {
     response.clearCookie("accessToken", {
       httpOnly: true,
       secure: true,
-      path: "/",
     });
     response.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
-      path: "/",
     });
 
     return null;
@@ -132,5 +141,46 @@ export class AuthenticationController {
     );
     response.type("image/png");
     return toFileStream(response, uri);
+  }
+
+  @Post("2fa/verify")
+  async verifyCode(
+    @ActiveUser() activeUser: UserPayload,
+    @Req() request: Request,
+    @Res() response: Response,
+    @Body() { code }: { code: string },
+  ): Promise<{ isValid: boolean }> {
+    try {
+      const user = await this.authService.getUserByEmail(activeUser.email!);
+      const isValid = this.otpAuthenticationService.verifyCode(
+        code,
+        user.TFASecret,
+      );
+      if (!isValid) {
+        throw new UnauthorizedException("Invalid 2FA code");
+      }
+
+      const { accessToken, refreshToken } =
+        await this.authService.generateTokens(user, {
+          isTFAAuthorised: true,
+        });
+      response.cookie("accessToken", accessToken, {
+        secure: true,
+        httpOnly: true,
+        sameSite: "none",
+      });
+      response.cookie("refreshToken", refreshToken, {
+        secure: true,
+        httpOnly: true,
+        sameSite: "none",
+      });
+
+      return { isValid: true };
+    } catch (error) {
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new UnauthorizedException("Unable to verify 2FA code");
+    }
   }
 }

@@ -22,12 +22,13 @@ import { checkAuth } from "@/../lib/slices/AuthSlice";
 import Divider from "@mui/material/Divider";
 import GoogleAuthButton from "@/[lng]/components/GoogleAuthButton/GoogleAuthButton";
 
-type Mode = "signin" | "signup" | "forgot";
+type Mode = "signin" | "signup" | "forgot" | "2fa";
 
 const endpoints = {
   signup: ROUTES.authentication.signup,
   signin: ROUTES.authentication.signin,
   forgot: ROUTES.authentication.forgot,
+  "2fa": ROUTES.authentication.verify2fa,
 };
 
 export default function AuthFormClient() {
@@ -35,6 +36,7 @@ export default function AuthFormClient() {
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [fetching, setFetching] = useState<boolean>(false);
+  const [show2FA, setShow2FA] = useState<boolean>(false);
   const [endpoint, setEndpoint] = useState<string>(
     ROUTES.authentication.signin,
   );
@@ -74,20 +76,26 @@ export default function AuthFormClient() {
     email?: string;
     name?: string;
     password?: string;
+    code?: string;
   }) => {
     setFetching(true);
     setFormError(null);
+    
+    const requestBody = mode === "2fa" 
+      ? { code: formData.verificationCode }
+      : {
+          email: formData.email,
+          full_name: formData.name,
+          password: formData.password,
+        };
+
     fetch(endpoint, {
       credentials: "include",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        email: formData.email,
-        full_name: formData.name,
-        password: formData.password,
-      }),
+      body: JSON.stringify(requestBody),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -103,7 +111,19 @@ export default function AuthFormClient() {
         } else {
           switch (mode) {
             case "signin":
-              // After successful sign-in, check auth to get user data
+              // Check if 2FA is required
+              if (data.isTFARequired) {
+                setShow2FA(true);
+                setMode("2fa");
+              } else {
+                // After successful sign-in, check auth to get user data
+                dispatch(checkAuth()).then(() => {
+                  router.push("/personal");
+                });
+              }
+              break;
+            case "2fa":
+              // After successful 2FA verification, check auth and redirect
               dispatch(checkAuth()).then(() => {
                 router.push("/personal");
               });
@@ -271,17 +291,19 @@ export default function AuthFormClient() {
                     {formState.errors.name.message as string}
                   </p>
                 )}
-                <TextField
-                  error={!!formState.errors.email}
-                  onMouseDown={handleFormMouseDown}
-                  id="email"
-                  label={t("fields.email")}
-                  type="email"
-                  {...register("email", {
-                    required: t("errors.required"),
-                  })}
-                />
-                {formState.errors.email && (
+                {mode !== "2fa" && (
+                  <TextField
+                    error={!!formState.errors.email}
+                    onMouseDown={handleFormMouseDown}
+                    id="email"
+                    label={t("fields.email")}
+                    type="email"
+                    {...register("email", {
+                      required: t("errors.required"),
+                    })}
+                  />
+                )}
+                {formState.errors.email && mode !== "2fa" && (
                   <p className="text-mui-error text-sm">
                     {formState.errors.email.message as string}
                   </p>
@@ -298,10 +320,49 @@ export default function AuthFormClient() {
                     })}
                   />
                 )}
-                {formState.errors.password && (
+                {formState.errors.password && mode !== "2fa" && (
                   <p className="text-mui-error text-sm">
                     {formState.errors.password.message as string}
                   </p>
+                )}
+
+                {/* Verification Code Field - only show in 2FA mode */}
+                {mode === "2fa" && (
+                  <>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 2, mb: 1 }}
+                    >
+                      {t("labels.verificationCodeDescription")}
+                    </Typography>
+                    <TextField
+                      error={!!formState.errors.verificationCode}
+                      onMouseDown={handleFormMouseDown}
+                      id="verificationCode"
+                      label={t("fields.verificationCode")}
+                      type="text"
+                      inputProps={{
+                        maxLength: 6,
+                        pattern: "[0-9]{6}",
+                        inputMode: "numeric",
+                      }}
+                      {...register("verificationCode", {
+                        required: t("errors.required"),
+                        pattern: {
+                          value: /^[0-9]{6}$/,
+                          message:
+                            t("errors.verificationCodeFormat") ||
+                            "Please enter a valid 6-digit code",
+                        },
+                      })}
+                    />
+                    {formState.errors.verificationCode && (
+                      <p className="text-mui-error text-sm">
+                        {formState.errors.verificationCode.message as string}
+                      </p>
+                    )}
+                  </>
                 )}
 
                 <Box sx={{ my: 2, position: "relative" }}>

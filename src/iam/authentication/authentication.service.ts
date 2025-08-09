@@ -18,6 +18,10 @@ import { AppSettingsService } from "../../app-settings/app-settings.service";
 import { Permission } from "../../permission/interface/Permission";
 import { OtpAuthenticationService } from "./otp-authentication.service";
 
+interface TokenOptions {
+  isTFAAuthorised?: boolean;
+}
+
 @Injectable()
 export class AuthenticationService {
   constructor(
@@ -71,17 +75,12 @@ export class AuthenticationService {
     }
   }
 
-  async signIn(
-    dto: SignInDTO,
-  ): Promise<{ accessToken: string; refreshToken: string }> {
-    const user = await this.userRepository.findOneBy({ email: dto.email });
-    if (!user) {
-      throw new AuthException(
-        AuthErrorType.USER_NOT_FOUND,
-        { email: dto.email },
-        401,
-      );
-    }
+  async signIn(dto: SignInDTO): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    isTFARequired: boolean;
+  }> {
+    const user: User = await this.getUserByEmail(dto.email);
     const isEqual = await this.hashingService.compare(
       dto.password,
       user.password,
@@ -93,29 +92,22 @@ export class AuthenticationService {
         401,
       );
     }
-    if (user.isTFAEnabled) {
-      const isValid = this.otpAuthenticationService.verifyCode(
-        dto.tfaCode!,
-        user.TFASecret,
-      );
-      if (!isValid) {
-        throw new AuthException(
-          AuthErrorType.INVALID_CREDENTIALS,
-          { tfaCode: dto.tfaCode },
-          401,
-        );
-      }
-    }
     return await this.generateTokens(user);
   }
 
-  async generateTokens(user: User) {
+  async generateTokens(user: User, options?: TokenOptions) {
     const refreshTokenId = randomUUID();
+    const isTFARequired = options?.isTFAAuthorised ? false : user.isTFAEnabled;
     const [accessToken, refreshToken]: [string, string] = await Promise.all([
       this.signToken<Partial<UserPayload>>(
         user.id,
         this.jwtConfiguration.accessTokenTtl,
-        { email: user.email, permissions: user.role, name: user.full_name },
+        {
+          email: user.email,
+          permissions: user.role,
+          name: user.full_name,
+          isTFARequired,
+        },
       ),
       this.signToken(user.id, this.jwtConfiguration.refreshTokenTtl, {
         refreshTokenId,
@@ -126,7 +118,7 @@ export class AuthenticationService {
       refreshTokenId,
       this.jwtConfiguration.refreshTokenTtl,
     );
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, isTFARequired };
   }
 
   private async signToken<T>(userId: number, expiresIn: number, payload?: T) {
@@ -172,7 +164,7 @@ export class AuthenticationService {
     }
   }
 
-  async getUserById(accessToken: string): Promise<User | null> {
+  async getUserByToken(accessToken: string): Promise<User | null> {
     const payload = await this.jwtService.verifyAsync<Pick<UserPayload, "sub">>(
       accessToken,
       {
@@ -183,5 +175,17 @@ export class AuthenticationService {
     );
     const id = payload.sub;
     return this.userRepository.findOneBy({ id });
+  }
+
+  async getUserByEmail(email: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ email });
+    if (!user) {
+      throw new AuthException(
+        AuthErrorType.USER_NOT_FOUND,
+        { email: email },
+        401,
+      );
+    }
+    return user;
   }
 }

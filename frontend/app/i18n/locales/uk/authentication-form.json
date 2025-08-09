@@ -5,7 +5,8 @@
     "VALIDATION_ERROR": "Сталася помилка валідації",
     "USER_NOT_FOUND": "Користувача не знайдено",
     "PASSWORD_MISMATCH": "Пароль не співпадає",
-    "googleAuth": "Помилка автентифікації Google. Спробуйте ще раз."
+    "googleAuth": "Помилка автентифікації Google. Спробуйте ще раз.",
+    "verificationCodeFormat": "Будь ласка, введіть дійсний 6-значний код"
   },
   "success": {
     "signup": "Реєстрація пройшла успішно",
@@ -24,7 +25,11 @@
   "fields": {
     "fullName": "Повне ім'я",
     "email": "Email",
-    "password": "Пароль"
+    "password": "Пароль",
+    "verificationCode": "Код верифікації"
+  },
+  "labels": {
+    "verificationCodeDescription": "Будь ласка, введіть 6-значний код верифікації, згенерований вашим додатком-аутентифікатором для підтвердження вашої особи."
   },
   "buttons": {
     "signin": "Увійти",
