@@ -156,9 +156,11 @@ export class AuthenticationService {
       });
       const user = await this.userRepository.findOneByOrFail({ id: sub });
       const isValid = await this.refreshTokenIds.validate(sub!, refreshTokenId);
+
       if (!isValid) {
         throw new Error("Refresh token is invalid");
       }
+
       await this.refreshTokenIds.invalidate(sub!);
       return this.generateTokens(user);
     } catch (error) {

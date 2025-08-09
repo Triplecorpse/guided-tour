@@ -16,6 +16,7 @@ import {
   Grid,
 } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
+import GoogleAuthButton from "@/[lng]/components/GoogleAuthButton/GoogleAuthButton";
 
 export default function ProfilePage() {
   const methods = useForm();
@@ -83,19 +84,8 @@ export default function ProfilePage() {
                 {/* Divider */}
                 <Divider />
 
-                {/* Google button (no handlers yet) */}
-                <Button
-                  variant="outlined"
-                  startIcon={
-                    <img
-                      src="https://developers.google.com/identity/images/g-logo.png"
-                      alt="Google"
-                      style={{ width: 18, height: 18 }}
-                    />
-                  }
-                >
-                  {t("buttons.google")}
-                </Button>
+                {/* Google authentication button with handlers */}
+                <GoogleAuthButton variant="outlined" />
               </Stack>
             </Box>
           </FormProvider>

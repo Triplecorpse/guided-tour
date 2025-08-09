@@ -20,8 +20,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/../lib/store";
 import { checkAuth } from "@/../lib/slices/AuthSlice";
 import Divider from "@mui/material/Divider";
-import { post } from "@/services/api.service";
-import { getGoogleIdToken } from "@/services/googleAuth.service";
+import GoogleAuthButton from "@/[lng]/components/GoogleAuthButton/GoogleAuthButton";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -195,34 +194,6 @@ export default function AuthFormClient() {
     };
   }, [dragging]);
 
-  const handleGoogleAuth = async () => {
-    try {
-      setFetching(true);
-      setFormError(null);
-
-      // Get Google ID token
-      const googleToken = await getGoogleIdToken();
-
-      // Send token to backend
-      const response = (await post(ROUTES.authentication.google, {
-        token: googleToken,
-      })) as any;
-
-      if (response.error) {
-        setFormError(t("errors.googleAuth"));
-      } else {
-        // Handle successful authentication
-        dispatch(checkAuth()).then(() => {
-          router.push("/personal");
-        });
-      }
-    } catch (error) {
-      console.error("Google auth error:", error);
-      setFormError(t("errors.googleAuth"));
-    } finally {
-      setFetching(false);
-    }
-  };
 
   return (
     <>
@@ -341,28 +312,12 @@ export default function AuthFormClient() {
                   </Divider>
                 </Box>
 
-                <Button
-                  variant="outlined"
+                <GoogleAuthButton
                   fullWidth
-                  startIcon={
-                    <img
-                      src="https://developers.google.com/identity/images/g-logo.png"
-                      alt="Google"
-                      style={{ width: 18, height: 18 }}
-                    />
-                  }
-                  sx={{
-                    borderColor: "rgba(0, 0, 0, 0.23)",
-                    backgroundColor: "rgba(255, 255, 255)",
-                    color: "text.primary",
-                    textTransform: "none",
-                    mb: 2,
-                  }}
+                  sx={{ mb: 2 }}
                   onMouseDown={handleFormMouseDown}
-                  onClick={handleGoogleAuth}
-                >
-                  {t("buttons.google")}
-                </Button>
+                  onError={(error) => setFormError(error)}
+                />
 
                 <Button
                   type="submit"
