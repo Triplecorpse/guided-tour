@@ -25,24 +25,15 @@ export class AuthenticationGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // First check if endpoint is public
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    const request: Request = context.switchToHttp().getRequest();
 
     if (isPublic) {
-      if (request.cookies.accessToken) {
-        const user: UserPayload = this.jwtService.decode(
-          request.cookies.accessToken as string,
-        );
-        request[REQUEST_USER_KEY] = user;
-      }
       return true;
     }
 
-    // If not public, use Bearer authentication by default
-    return this.accessTokenGuard.canActivate(context);
+    return await this.accessTokenGuard.canActivate(context);
   }
 }

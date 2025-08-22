@@ -2,10 +2,10 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Post,
   Req,
   Res,
-  UnauthorizedException,
 } from "@nestjs/common";
 import { AuthenticationService } from "./authentication.service";
 import { SignUpDTO } from "./dto/sign-up-dto";
@@ -19,6 +19,8 @@ import { UserPayload } from "../types/UserPayload";
 import { RefreshTokenDto } from "./dto/refresh-token.dto";
 import { OtpAuthenticationService } from "./otp-authentication.service";
 import { toFileStream } from "qrcode";
+import { AuthException } from "../../auth-exception/AuthException";
+import { AuthErrorType } from "./enums/auth-error.enum";
 
 @Auth(AuthType.None)
 @Controller("authentication")
@@ -60,53 +62,35 @@ export class AuthenticationController {
   @Public()
   @Post("refresh-tokens")
   async refreshTokens(
+    @Req() request: Request,
     @Res({ passthrough: true }) response: Response,
-    @Body() data: RefreshTokenDto,
   ) {
-    const tokens = await this.authService.refreshTokens(data);
+    const refreshToken = request.cookies.refreshToken as string;
+
+    if (!refreshToken) {
+      throw new AuthException(AuthErrorType.TOKEN_NOT_PROVIDED);
+    }
+
+    const tokens = await this.authService.refreshTokens({ refreshToken });
     response.cookie("accessToken", tokens.accessToken, {
       secure: true,
       httpOnly: true,
-      sameSite: true,
+      sameSite: "none",
     });
     response.cookie("refreshToken", tokens.refreshToken, {
       secure: true,
       httpOnly: true,
-      sameSite: true,
+      sameSite: "none",
     });
     return tokens;
   }
 
-  @Public()
   @Get("check")
   async check(
     @ActiveUser() user: UserPayload,
     @Res({ passthrough: true }) response: Response,
     @Req() request: Request,
   ): Promise<{ isAuthenticated: boolean; user?: UserPayload }> {
-    const refreshToken: string | undefined = request.cookies.refreshToken as
-      | string
-      | undefined;
-    if (!user && refreshToken) {
-      const tokens = await this.authService.refreshTokens({ refreshToken });
-      response.cookie("accessToken", tokens.accessToken, {
-        secure: true,
-        httpOnly: true,
-        sameSite: "none",
-      });
-      response.cookie("refreshToken", tokens.refreshToken, {
-        secure: true,
-        httpOnly: true,
-        sameSite: "none",
-      });
-
-      const user = await this.authService.getUserByToken(tokens.accessToken);
-      return {
-        isAuthenticated: !!user,
-        user: { name: user?.full_name, sub: user?.id, email: user?.email },
-      };
-    }
-
     return {
       isAuthenticated: !!user,
       user: { name: user?.name, email: user?.email, sub: user?.sub },
@@ -118,10 +102,12 @@ export class AuthenticationController {
     response.clearCookie("accessToken", {
       httpOnly: true,
       secure: true,
+      sameSite: "none",
     });
     response.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
+      sameSite: "none",
     });
 
     return null;
@@ -157,7 +143,7 @@ export class AuthenticationController {
         user.TFASecret,
       );
       if (!isValid) {
-        throw new UnauthorizedException("Invalid 2FA code");
+        throw new AuthException(AuthErrorType.TFA_INVALID);
       }
 
       const { accessToken, refreshToken } =
@@ -178,10 +164,15 @@ export class AuthenticationController {
 
       return { isValid: true };
     } catch (error) {
-      if (error instanceof UnauthorizedException) {
+      if (error instanceof AuthException) {
         throw error;
       }
-      throw new UnauthorizedException("Unable to verify 2FA code");
+      throw new AuthException(
+        AuthErrorType.TFA_INVALID,
+        {},
+        HttpStatus.UNAUTHORIZED,
+        error.message,
+      );
     }
   }
 }

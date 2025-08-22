@@ -1,4 +1,4 @@
-import { HttpException } from "@nestjs/common";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import { AuthErrorType } from "../iam/authentication/enums/auth-error.enum";
 
 export interface AuthErrorResponse {
@@ -13,9 +13,9 @@ export interface AuthErrorResponse {
 export class AuthException extends HttpException {
   constructor(
     type: AuthErrorType,
-    data?: Record<string, any>,
-    status?: number,
-    originalMessage?: string,
+    data: Record<string, any> = {},
+    status: number = HttpStatus.UNAUTHORIZED,
+    originalMessage: string = "",
   ) {
     const response: AuthErrorResponse = {
       message: type,

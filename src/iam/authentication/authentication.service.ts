@@ -97,7 +97,7 @@ export class AuthenticationService {
 
   async generateTokens(user: User, options?: TokenOptions) {
     const refreshTokenId = randomUUID();
-    const isTFARequired = options?.isTFAAuthorised ? false : user.isTFAEnabled;
+    const isTFARequired = false; //options?.isTFAAuthorised ? false : user.isTFAEnabled;
     const [accessToken, refreshToken]: [string, string] = await Promise.all([
       this.signToken<Partial<UserPayload>>(
         user.id,

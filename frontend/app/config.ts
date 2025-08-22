@@ -6,6 +6,7 @@ export const ROUTES = {
     signup: API_URL + "/authentication/sign-up",
     signin: API_URL + "/authentication/sign-in",
     signout: API_URL + "/authentication/sign-out",
+    refresh: API_URL + "/authentication/refresh-tokens",
     forgot: API_URL + "/authentication/forgot-password",
     google: API_URL + "/authentication/google",
     generateSecret: API_URL + "/authentication/2fa/generate-secret",
@@ -13,6 +14,7 @@ export const ROUTES = {
   },
   users: {
     list: API_URL + "/users",
+    profile: API_URL + "/users/profile",
   },
   roles: {
     list: API_URL + "/permissions",

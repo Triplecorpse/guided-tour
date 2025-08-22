@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useT } from "@/i18n/client";
 import {
   Alert,
@@ -21,16 +21,46 @@ import {
 import { FormProvider, useForm } from "react-hook-form";
 import GoogleAuthButton from "@/[lng]/components/GoogleAuthButton/GoogleAuthButton";
 import { ROUTES } from "@/config";
-import { post } from "@/services/api.service";
+import { get, post } from "@/services/api.service";
+
+interface User {
+  id: number;
+  email: string;
+  isTFAEnabled: boolean;
+}
 
 export default function ProfilePage() {
   const methods = useForm();
   const { t } = useT("profile");
+  const [user, setUser] = useState<User>(null);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState<string>("");
+
+  // Add useEffect to fetch user profile
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userData: User = await get(ROUTES.users.profile);
+
+        setUser(userData);
+
+        // Populate form with user data
+        methods.setValue("email", userData.email);
+        methods.setValue("enable2fa", userData.isTFAEnabled);
+        // Don't populate password for security reasons
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [methods]);
 
   const handle2FAToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isEnabled = event.target.checked;
@@ -91,6 +121,10 @@ export default function ProfilePage() {
       setIsVerifying(false);
     }
   };
+
+  if (loading) {
+    return <CircularProgress />;
+  }
 
   return (
     <Grid container spacing={2}>

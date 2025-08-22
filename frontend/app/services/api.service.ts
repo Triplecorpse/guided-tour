@@ -6,7 +6,16 @@ function fetchWrapper<T>(url: string, params: RequestInit): Promise<T> {
       "Content-Type": "application/json",
       ...params.headers,
     },
-  }).then((response) => response.json());
+  })
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.message === "TOKEN_EXPIRED") {
+        return get(ROUTES.authentication.refresh).then(() =>
+          fetchWrapper<T>(url, params),
+        );
+      }
+      return response;
+    });
 }
 
 export function get<T>(url: string, params?: RequestInit): Promise<T> {

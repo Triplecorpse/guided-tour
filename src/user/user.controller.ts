@@ -4,20 +4,49 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
-  UseGuards,
 } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import { UserProfileDto } from "./dto/user-profile.dto";
 import { User } from "../iam/User";
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from "@nestjs/swagger";
+import { ActiveUser } from "../iam/decorators/active-user.decorator";
+import { UserPayload } from "../iam/types/UserPayload";
+import { Public } from "src/common/decorators/public.decorator";
 
 @ApiTags("users")
 @Controller("users")
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get("profile")
+  @ApiOperation({ summary: "Get current user's profile" })
+  @ApiResponse({
+    status: 200,
+    description: "Return the current user's profile",
+    type: UserProfileDto,
+  })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  async getCurrentUserProfile(
+    @ActiveUser() activeUser: UserPayload,
+  ): Promise<UserProfileDto> {
+    console.log("activeUser", activeUser);
+    const user = await this.userService.findOne(activeUser.sub!);
+
+    // Map to UserProfileDto to exclude sensitive fields
+    return {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      googleId: user.googleId,
+      isTFAEnabled: user.isTFAEnabled,
+      role: user.role,
+    };
+  }
 
   @Post()
   @ApiOperation({ summary: "Create a new user" })
@@ -43,8 +72,8 @@ export class UserController {
   @ApiParam({ name: "id", type: "number" })
   @ApiResponse({ status: 200, description: "Return the user", type: User })
   @ApiResponse({ status: 404, description: "User not found" })
-  async findOne(@Param("id") id: string): Promise<User> {
-    return this.userService.findOne(+id);
+  async findOne(@Param("id", ParseIntPipe) id: number): Promise<User> {
+    return this.userService.findOne(id);
   }
 
   @Patch(":id")

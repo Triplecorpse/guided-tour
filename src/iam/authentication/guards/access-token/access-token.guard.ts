@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  HttpStatus,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -11,6 +12,8 @@ import { ConfigType } from "@nestjs/config";
 import { Request } from "express";
 import { REQUEST_USER_KEY } from "../../../iam.constants";
 import { UserPayload } from "../../../types/UserPayload";
+import { AuthException } from "../../../../auth-exception/AuthException";
+import { AuthErrorType } from "../../enums/auth-error.enum";
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
@@ -22,10 +25,12 @@ export class AccessTokenGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromCookies(request);
+    const token: string | void = request.cookies.accessToken as string | void;
+
+    console.log(token);
 
     if (!token) {
-      throw new UnauthorizedException();
+      throw new AuthException(AuthErrorType.TOKEN_NOT_PROVIDED);
     }
 
     try {
@@ -34,16 +39,25 @@ export class AccessTokenGuard implements CanActivate {
         this.jwtConfiguration,
       );
       if (payload.isTFARequired) {
-        throw new UnauthorizedException("TFA is required");
+        throw new AuthException(AuthErrorType.TFA_REQUIRED);
       }
       request[REQUEST_USER_KEY] = payload;
     } catch (e) {
-      throw new UnauthorizedException(e);
+      if (e instanceof AuthException) {
+        throw e;
+      }
+
+      if (e.name === "TokenExpiredError") {
+        throw new AuthException(AuthErrorType.TOKEN_EXPIRED);
+      }
+
+      throw new AuthException(
+        AuthErrorType.TOKEN_NOT_VERIFIED,
+        {},
+        HttpStatus.UNAUTHORIZED,
+        JSON.stringify(e),
+      );
     }
     return true;
-  }
-
-  private extractTokenFromCookies(request: Request): string | undefined {
-    return request.cookies.accessToken as string | undefined;
   }
 }
