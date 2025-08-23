@@ -25,7 +25,7 @@ export default function ClientHeader() {
       await dispatch(logoutThunk());
       router.push("/");
     } else if (value === "dashboard") {
-      router.push("/dashboard");
+      router.push("/personal");
     } else if (value === "profile") {
       router.push("/personal/profile");
     }
