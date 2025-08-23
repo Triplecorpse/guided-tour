@@ -1,0 +1,18 @@
+{
+  "title": "Dashboard",
+  "tiles": {
+    "usersPermissions": {
+      "title": "Users & Permissions",
+      "description": "Manage user accounts, roles, and access permissions for your application"
+    },
+    "locationsPoi": {
+      "title": "Locations & POI",
+      "description": "Manage locations and points of interest for your guided tours"
+    },
+    "appSettings": {
+      "title": "Global App Settings",
+      "description": "Configure global application settings and preferences"
+    }
+  }
+}
+
