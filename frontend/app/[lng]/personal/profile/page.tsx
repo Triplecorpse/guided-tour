@@ -7,6 +7,11 @@ import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   FormControlLabel,
   Grid,
@@ -18,7 +23,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import GoogleAuthButton from "@/[lng]/components/GoogleAuthButton/GoogleAuthButton";
 import { ROUTES } from "@/config";
 import { get, post } from "@/services/api.service";
@@ -27,6 +32,9 @@ interface User {
   id: number;
   email: string;
   isTFAEnabled: boolean;
+  isPasswordSet: boolean;
+  isGoogleAuthenticationEnabled: boolean;
+  full_name: string;
 }
 
 export default function ProfilePage() {
@@ -39,18 +47,19 @@ export default function ProfilePage() {
   const [verificationCode, setVerificationCode] = useState<string>("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationError, setVerificationError] = useState<string>("");
+  const [isDisableConfirmOpen, setIsDisableConfirmOpen] = useState(false);
 
   // Add useEffect to fetch user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const userData: User = await get(ROUTES.users.profile);
+        const userData: { data: User } = await get(ROUTES.users.profile);
 
-        setUser(userData);
+        setUser(userData.data);
 
         // Populate form with user data
-        methods.setValue("email", userData.email);
-        methods.setValue("enable2fa", userData.isTFAEnabled);
+        methods.setValue("email", userData.data.email);
+        methods.setValue("enable2fa", userData.data.isTFAEnabled);
         // Don't populate password for security reasons
       } catch (error) {
         console.error("Error fetching user profile:", error);
@@ -88,6 +97,11 @@ export default function ProfilePage() {
           methods.setValue("enable2fa", false);
         }
       })();
+    } else {
+      // Reset the switch to enabled state temporarily while showing confirmation
+      methods.setValue("enable2fa", true);
+      // Open disable confirmation dialog
+      setIsDisableConfirmOpen(true);
     }
   };
 
@@ -119,6 +133,22 @@ export default function ProfilePage() {
       setVerificationError(t("messages.verificationError"));
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    setIsDisableConfirmOpen(false);
+
+    try {
+      const result = await post(ROUTES.authentication.disable2fa);
+
+      if (!result.error) {
+        // Update local user state
+        setUser((prev) => ({ ...prev, isTFAEnabled: false }));
+        methods.setValue("enable2fa", false);
+      }
+    } catch (error) {
+      console.error("Error disabling 2FA:", error);
     }
   };
 
@@ -171,26 +201,37 @@ export default function ProfilePage() {
                   </Button>
                 </Stack>
 
-                {/* Divider */}
-                <Divider />
-
                 {/* Enable 2FA toggle */}
                 <FormControlLabel
                   control={
-                    <Switch
-                      color="primary"
-                      {...methods.register("enable2fa")}
-                      onChange={handle2FAToggle}
+                    <Controller
+                      name="enable2fa"
+                      control={methods.control}
+                      render={({ field }) => (
+                        <Switch
+                          color="primary"
+                          checked={field.value || false}
+                          onChange={(e) => {
+                            field.onChange(e.target.checked);
+                            handle2FAToggle(e);
+                          }}
+                        />
+                      )}
                     />
                   }
                   label={t("fields.enable2fa")}
                 />
 
-                {/* Divider */}
                 <Divider />
 
                 {/* Google authentication button with handlers */}
                 <GoogleAuthButton variant="outlined" />
+                {user?.isGoogleAuthenticationEnabled && (
+                  <p>{t("fields.google") + user.full_name}</p>
+                )}
+                <Button variant="text" type="button">
+                  {t("buttons.logout") + "Google"}
+                </Button>
               </Stack>
             </Box>
           </FormProvider>
@@ -274,6 +315,36 @@ export default function ProfilePage() {
             </Button>
           </Box>
         </Modal>
+
+        {/* 2FA Disable Confirmation Dialog */}
+        <Dialog
+          open={isDisableConfirmOpen}
+          onClose={() => setIsDisableConfirmOpen(false)}
+        >
+          <DialogTitle>{t("titles.confirmDisable2fa")}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {t("messages.confirmDisable2fa")}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              variant="outlined"
+              onClick={() => setIsDisableConfirmOpen(false)}
+              color="primary"
+            >
+              {t("buttons.cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => void handleDisable2FA()}
+              color="primary"
+              autoFocus
+            >
+              {t("buttons.confirm")}
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Grid>
     </Grid>
   );

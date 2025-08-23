@@ -34,7 +34,6 @@ export class UserController {
   async getCurrentUserProfile(
     @ActiveUser() activeUser: UserPayload,
   ): Promise<UserProfileDto> {
-    console.log("activeUser", activeUser);
     const user = await this.userService.findOne(activeUser.sub!);
 
     // Map to UserProfileDto to exclude sensitive fields
@@ -42,7 +41,8 @@ export class UserController {
       id: user.id,
       email: user.email,
       full_name: user.full_name,
-      googleId: user.googleId,
+      isGoogleAuthenticationEnabled: !!user.googleId,
+      isPasswordSet: !!user.password,
       isTFAEnabled: user.isTFAEnabled,
       role: user.role,
     };
