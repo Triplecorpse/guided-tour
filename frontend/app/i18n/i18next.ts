@@ -19,13 +19,17 @@ await i18next
     debug: true,
     supportedLngs: languages,
     fallbackLng,
-    lng: undefined, // let detect the language on client side
+    lng: undefined,
     fallbackNS: defaultNS,
     defaultNS,
+    ns: defaultNS,
     detection: {
       order: ["path", "htmlTag", "cookie", "navigator"],
     },
     preload: runsOnServerSide ? languages : [],
+    backend: {
+      loadPath: "./frontend/app/i18n/locales/{{lng}}/{{ns}}.json",
+    },
   });
 
 export default i18next;

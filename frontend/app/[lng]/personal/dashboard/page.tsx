@@ -86,12 +86,13 @@ export default function DashboardPage() {
           {t("title")}
         </Typography>
 
-        <Grid container spacing={4} justifyContent="center" maxWidth="md">
+        <Grid container spacing={4} justifyContent="center">
           {tiles.map((tile) => (
-            <Grid item xs={12} sm={6} md={4} key={tile.id}>
+            <Grid key={tile.id}>
               <Card
                 sx={{
                   height: 280,
+                  width: 280,
                   cursor: "pointer",
                   transition: "all 0.3s ease-in-out",
                   "&:hover": {
