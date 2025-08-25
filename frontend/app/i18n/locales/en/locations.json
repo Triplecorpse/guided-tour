@@ -1,0 +1,42 @@
+{
+  "tabNames": {
+    "locations": "Locations",
+    "points": "Points of Interest"
+  },
+  "titles": {
+    "locationManagement": "Location Management",
+    "poiManagement": "Points of Interest Management",
+    "addLocation": "Add Location",
+    "editLocation": "Edit Location",
+    "addPoi": "Add Point of Interest",
+    "editPoi": "Edit Point of Interest"
+  },
+  "fields": {
+    "locationName": "Location Name",
+    "parentLocation": "Parent Location",
+    "poiName": "POI Name",
+    "poiType": "POI Type",
+    "recommendations": "Recommendations",
+    "coordinates": "Coordinates"
+  },
+  "buttons": {
+    "addLocation": "Add Location",
+    "addPoi": "Add POI",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "messages": {
+    "confirmDeleteLocation": "Are you sure you want to delete this location?",
+    "confirmDeletePoi": "Are you sure you want to delete this point of interest?",
+    "locationDeleted": "Location deleted successfully",
+    "poiDeleted": "POI deleted successfully",
+    "locationSaved": "Location saved successfully",
+    "poiSaved": "POI saved successfully"
+  }
+}
+

@@ -338,7 +338,7 @@ export default function ProfilePage() {
             <Button
               variant="contained"
               onClick={() => void handleDisable2FA()}
-              color="primary"
+              color="error"
               autoFocus
             >
               {t("buttons.confirm")}

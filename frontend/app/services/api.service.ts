@@ -48,3 +48,10 @@ export function patch<T>(
     body: JSON.stringify(data),
   });
 }
+
+export function del<T>(url: string, params?: RequestInit): Promise<T> {
+  return fetchWrapper<T>(url, {
+    ...params,
+    method: "DELETE",
+  });
+}
