@@ -1,12 +1,11 @@
-import { getT } from "@/i18n";
 import { Header } from "./components/Header/Header";
 import RouteBackground from "./components/RouteBackground/RouteBackground";
 
-export default async function Layout({ children, params }: { children: React.ReactNode; params: { lng: string } }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <RouteBackground>
       <Header />
       {children}
     </RouteBackground>
   );
-} 
+}

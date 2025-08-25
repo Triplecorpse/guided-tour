@@ -1,5 +1,3 @@
-import { languages } from "@/i18n/settings";
-import { getT } from "@/i18n";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.scss";
 import { EmotionProvider } from "@/providers";
@@ -16,22 +14,15 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export async function generateStaticParams() {
-  return languages.map((lng) => ({ lng }));
-}
-
-export async function generateMetadata() {
-  const { t } = await getT("main-page", {});
-  return {
-    title: t("title"),
-  };
-}
-
-export default async function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script
+          src="https://accounts.google.com/gsi/client"
+          async
+          defer
+        ></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

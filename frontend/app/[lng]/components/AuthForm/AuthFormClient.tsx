@@ -77,17 +77,19 @@ export default function AuthFormClient() {
     name?: string;
     password?: string;
     code?: string;
+    verificationCode?: string;
   }) => {
     setFetching(true);
     setFormError(null);
-    
-    const requestBody = mode === "2fa" 
-      ? { code: formData.verificationCode }
-      : {
-          email: formData.email,
-          full_name: formData.name,
-          password: formData.password,
-        };
+
+    const requestBody =
+      mode === "2fa"
+        ? { code: formData.verificationCode }
+        : {
+            email: formData.email,
+            full_name: formData.name,
+            password: formData.password,
+          };
 
     fetch(endpoint, {
       credentials: "include",
@@ -213,7 +215,6 @@ export default function AuthFormClient() {
       window.removeEventListener("mouseup", handleMouseUp);
     };
   }, [dragging]);
-
 
   return (
     <>

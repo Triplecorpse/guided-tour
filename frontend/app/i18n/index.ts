@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 
 export async function getT(
   ns: string,
-  options: Record<string, unknown>,
+  options?: Record<string, unknown>,
 ): Promise<any> {
   const headerList = await headers();
   const lng = headerList.get(headerName);
