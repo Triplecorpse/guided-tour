@@ -14,11 +14,8 @@ import { Location } from "./location";
 import { PaginationQueryDto } from "../common/pagination-query.dto/pagination-query.dto";
 import { ParseIntPipe } from "../common/pipes/parse-int/parse-int/.pipe";
 import { ApiTags } from "@nestjs/swagger";
-import { Request } from "express";
-import { ActiveUser } from "../iam/decorators/active-user.decorator";
-import { UserPayload } from "../iam/types/UserPayload";
-import { Roles } from "../iam/decorators/roles.decorator";
-import { Role } from "../iam/enums/role.enum";
+import { Permissions } from "../iam/decorators/permissions.decorator";
+import { Permission } from "../iam/enums/permission.enum";
 
 export interface CreateLocationDTO {
   name: string;
@@ -37,29 +34,31 @@ export class LocationController {
   constructor(private readonly locationService: LocationService) {}
 
   @Get("all")
+  @Permissions(Permission.READ_LOCATION)
   findAll(@Query() paginationQuery: PaginationQueryDto): Promise<Location[]> {
     return this.locationService.findAll(paginationQuery);
   }
 
   @Get(":id")
+  @Permissions(Permission.READ_LOCATION)
   find(@Param("id", ParseIntPipe) id: number) {
     return this.locationService.find({ id: +id });
   }
 
-  @Roles(Role.Admin)
   @Post()
+  @Permissions(Permission.CREATE_LOCATION)
   create(@Body() location: CreateLocationDTO) {
     return this.locationService.create(location);
   }
 
-  @Roles(Role.Admin)
   @Patch(":id")
+  @Permissions(Permission.UPDATE_LOCATION)
   update(@Param("id") id: number, @Body() location: UpdateLocationDTO) {
     return this.locationService.update({ ...location, id });
   }
 
-  @Roles(Role.Admin)
   @Delete(":id")
+  @Permissions(Permission.DELETE_LOCATION)
   remove(@Param("id") id: string) {
     return this.locationService.remove([+id]);
   }

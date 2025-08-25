@@ -178,7 +178,10 @@ export class AuthenticationService {
   }
 
   async getUserByEmail(email: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ email });
+    const user = await this.userRepository.findOne({
+      where: { email },
+      relations: ["role"],
+    });
     if (!user) {
       throw new AuthException(
         AuthErrorType.USER_NOT_FOUND,

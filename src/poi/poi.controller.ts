@@ -12,17 +12,16 @@ import {
 import { PoiService } from "./poi.service";
 import { POI } from "./interface/POI";
 import { PaginationQueryDto } from "../common/pagination-query.dto/pagination-query.dto";
-import { Public } from "../common/decorators/public.decorator";
 import { ParseIntPipe } from "../common/pipes/parse-int/parse-int/.pipe";
-import { Protocol } from "../common/decorators/protocol.decorator";
 import { CreatePoiDTO } from "./interface/CreatePoiDTO";
 import { UpdatePoiDTO } from "./interface/UpdatePoiDTO";
 import { ApiForbiddenResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Request } from "express";
 import { ActiveUser } from "../iam/decorators/active-user.decorator";
 import { UserPayload } from "../iam/types/UserPayload";
-import { Roles } from "../iam/decorators/roles.decorator";
+import { Permissions } from "../iam/decorators/permissions.decorator";
 import { Role } from "../iam/enums/role.enum";
+import { Permission } from "../iam/enums/permission.enum";
 
 @ApiTags("pois")
 @Controller("poi")
@@ -30,6 +29,7 @@ export class PoiController {
   constructor(private readonly poiService: PoiService) {}
 
   @Get("all")
+  @Permissions(Permission.READ_POI)
   findAll(
     @Query() paginationQuery: PaginationQueryDto,
     @Req() request: Request,
@@ -39,23 +39,24 @@ export class PoiController {
   }
 
   @Get(":id")
+  @Permissions(Permission.READ_POI)
   find(@Param("id", ParseIntPipe) id: number) {
     return this.poiService.find({ id: +id });
   }
 
-  @Roles(Role.Admin)
   @Post()
+  @Permissions(Permission.CREATE_POI)
   create(@Body() buddy: CreatePoiDTO) {
     return this.poiService.create(buddy);
   }
 
-  @Roles(Role.Admin)
   @Patch(":id")
+  @Permissions(Permission.UPDATE_POI)
   update(@Param("id") id: number, @Body() buddy: UpdatePoiDTO) {
     return this.poiService.update({ ...buddy, id });
   }
 
-  @Roles(Role.Admin)
+  @Permissions(Permission.DELETE_POI)
   @Delete(":id")
   remove(@Param("id") id: string) {
     return this.poiService.remove([+id]);

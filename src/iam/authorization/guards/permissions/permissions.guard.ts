@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { UserPayload } from "../../../types/UserPayload";
 import { REQUEST_USER_KEY } from "../../../iam.constants";
 import { PERMISSIONS_KEY } from "../../../decorators/permissions.decorator";
-import { PermissionType } from "../../permission.type";
+import { Permission } from "../../../enums/permission.enum";
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -13,20 +13,19 @@ export class PermissionsGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const contextPermissions = this.reflector.getAllAndOverride<
-      PermissionType[]
-    >(PERMISSIONS_KEY, [context.getHandler(), context.getClass()]);
+    const permission = this.reflector.getAllAndOverride<Permission>(
+      PERMISSIONS_KEY,
+      [context.getHandler(), context.getClass()],
+    );
 
-    if (!contextPermissions) {
+    if (!permission) {
       return true;
     }
 
     const user: UserPayload = context.switchToHttp().getRequest()[
       REQUEST_USER_KEY
-    ];
+    ] as UserPayload;
 
-    return contextPermissions.every((permission) =>
-      user?.permissions ? user.permissions[permission] === true : false,
-    );
+    return Boolean(user.permissions && user.permissions[permission]);
   }
 }
